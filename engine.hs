@@ -5,6 +5,16 @@ import qualified Data.Map.Strict as Map
 main = do test_binary
 
 
+test_globals = do
+   let a1 = Answer 1 1 1
+       a2 = Answer 2 2 2 
+       globals = empty_global
+       as = Answers 10 [a1,a2]
+       globals' = addResultToGlobals [a1,a2] globals 
+       globals'' = addResultToGlobals [a1,a2] globals' 
+   print globals''
+
+
 updateIMap theMap f answers =
    let newNums = map (\a -> (answer_questionId a, f a)) answers
        theMap' = Map.unionWith (+) theMap $ Map.fromList newNums
