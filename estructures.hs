@@ -90,7 +90,7 @@ data TimePoint = TimePoint {
    t_week :: Maybe Int,
    t_relation :: Relations,
    t_globals :: Globals,
-   t_answers :: Answers
+   t_answers :: [Answers]
 } deriving (Show, Eq)
 
 
