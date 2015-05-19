@@ -1,13 +1,12 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-
 module Estructures where
 
 import qualified Data.Map.Strict as Map
 import Data.Time
 import Data.Binary
-
+import Control.Monad
 
 type IIMap = Map.Map Int Int 
 iiMap = Map.empty :: IIMap
@@ -48,7 +47,7 @@ data Relations = Relations {
    relation_points :: IIMap, 
    relation_nums :: IIMap,
    relation_max :: IIMap 
-} deriving (Show) 
+} deriving (Show, Eq) 
 
 instance Binary Relations where
    put Relations{..} = do put realtion_questionId; put relation_points; put relation_nums; put relation_max;
@@ -64,7 +63,7 @@ data Globals = Globals {
    globals_points :: IIMap,
    globals_max :: IIMap,
    globals_nums :: IIMap 
-} deriving (Show) 
+} deriving (Show, Eq) 
 
 instance Binary Globals where
    put Globals{..} = do put globals_points; put globals_max; put globals_nums;
@@ -81,6 +80,26 @@ test_binary = do
    print $ b2 == as 
    print b2
    putStrLn "done"
+
+
+-- A snapshow of learning info on a given point in time
+
+data TimePoint = TimePoint {
+   t_year :: Maybe Int,
+   t_month :: Maybe Int,
+   t_week :: Maybe Int,
+   t_relation :: Relations,
+   t_globals :: Globals,
+   t_answers :: Answers
+} deriving (Show, Eq)
+
+
+ccompare v v' n = let res = compare v v' in if res /= EQ then res else n
+
+instance Ord TimePoint where
+   (TimePoint year month week _ _ _) `compare` (TimePoint year' month' week' _ _ _) = 
+	ccompare year year' $ ccompare month month' $ ccompare week week' EQ 
+
 
 main2 = do
    putStrLn "Life is short"
