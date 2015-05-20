@@ -8,8 +8,11 @@ import Data.Time
 import Data.Binary
 import Control.Monad
 
-type IIMap = Map.Map Int Int 
+type IIMap = Map.Map Int Int  
 iiMap = Map.empty :: IIMap
+
+type FTMap = Map.Map Int FromTo
+ftMap = Map.empty :: FTMap
 
 -- Answers, containing all answers from the pupils
 
@@ -36,6 +39,12 @@ instance Binary Answers where
 	     answers <- get;
              let res = Answers pupil answers 
              return res
+
+
+--- FromTo questionId
+
+data FromTo = FromTo Int Int deriving (Eq, Ord, Show)
+
  
 --- Answer relations
 --- Each realation is between a question and all answers that can be connected to that question
