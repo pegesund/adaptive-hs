@@ -11,7 +11,7 @@ import Control.Monad
 type IIMap = Map.Map Int Int  
 iiMap = Map.empty :: IIMap
 
-type FTMap = Map.Map Int FromTo
+type FTMap = Map.Map FromTo Int
 ftMap = Map.empty :: FTMap
 
 -- Answers, containing all answers from the pupils
@@ -43,9 +43,15 @@ instance Binary Answers where
 
 --- FromTo questionId
 
-data FromTo = FromTo Int Int deriving (Eq, Ord, Show)
+data FromTo = FromTo {
+   ft_from :: Int,
+   ft_to :: Int
+} deriving (Eq, Ord, Show)
 
- 
+instance Binary FromTo where
+   put FromTo{..} = do put ft_from; put ft_to;
+   get = do ft_from <- get; ft_to <- get; return FromTo{..} 
+
 --- Answer relations
 --- Each realation is between a question and all answers that can be connected to that question
 --- The base for the connections are found in the answer datatype
@@ -53,16 +59,16 @@ data FromTo = FromTo Int Int deriving (Eq, Ord, Show)
 
 data Relations = Relations {
    realtion_questionId :: Int,
-   relation_points :: IIMap, 
-   relation_nums :: IIMap,
-   relation_max :: IIMap 
+   relation_points :: FTMap, 
+   relation_nums :: FTMap,
+   relation_max :: FTMap 
 } deriving (Show, Eq) 
 
 instance Binary Relations where
    put Relations{..} = do put realtion_questionId; put relation_points; put relation_nums; put relation_max;
    get = do realtion_questionId <- get; relation_points <- get; relation_nums <- get; relation_max <- get; return Relations{..}
 
-empty_relation qId = Relations qId iiMap iiMap iiMap
+empty_relation qId = Relations qId ftMap ftMap ftMap
 
 --- Answer global results
 --- Keeps track of accumulated answers results
