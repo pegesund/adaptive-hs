@@ -33,9 +33,11 @@ addAnswersToRelations answers relations =
        max' = updateFTMap max (\a -> answer_max a) answers questionId
    in Relations questionId points' nums' max' 
 
-addResult newAnswers timePoint = 
+addResultToTimePoint :: Answers -> TimePoint -> TimePoint
+addResultToTimePoint newAnswers timePoint = 
    let Answers pupil pupilAnswers = newAnswers 
        TimePoint year month week relation globals answers = timePoint 
        answers' = answers ++ [newAnswers]
        globals' = addAnswersToGlobals pupilAnswers globals
-   in answers
+       relation' = addAnswersToRelations pupilAnswers relation
+   in TimePoint year month week relation' globals' answers' 
