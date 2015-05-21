@@ -42,11 +42,16 @@ instance Binary Answers where
 
 
 --- FromTo questionId
+--- Used to connect the different questions
+--- Think of it as neurones
 
 data FromTo = FromTo {
    ft_from :: Int,
    ft_to :: Int
-} deriving (Eq, Ord, Show)
+} deriving (Eq, Ord)
+
+instance Show FromTo where
+   show FromTo{..} = show ft_from ++ "-" ++ show ft_to
 
 instance Binary FromTo where
    put FromTo{..} = do put ft_from; put ft_to;
@@ -58,15 +63,15 @@ instance Binary FromTo where
 --- So if one pupil has answers on question 2 and 4 we calculate the relations between these, based on their points
 
 data Relations = Relations {
-   realtion_questionId :: Int,
+   relation_questionId :: Int,
    relation_points :: FTMap, 
    relation_nums :: FTMap,
    relation_max :: FTMap 
 } deriving (Show, Eq) 
 
 instance Binary Relations where
-   put Relations{..} = do put realtion_questionId; put relation_points; put relation_nums; put relation_max;
-   get = do realtion_questionId <- get; relation_points <- get; relation_nums <- get; relation_max <- get; return Relations{..}
+   put Relations{..} = do put relation_questionId; put relation_points; put relation_nums; put relation_max;
+   get = do relation_questionId <- get; relation_points <- get; relation_nums <- get; relation_max <- get; return Relations{..}
 
 empty_relation qId = Relations qId ftMap ftMap ftMap
 
@@ -85,17 +90,6 @@ instance Binary Globals where
    get = do globals_points <- get; globals_max <- get; globals_nums <- get; return Globals{..}
 
 empty_global = Globals iiMap iiMap iiMap
-
-test_binary = do
-   let a1 = Answer 1 2 3 
-       a2 = Answer 4 5 6 
-       as = Answers 10 [a1,a2]
-       b1 = encode as
-       b2 = decode b1::Answers
-   print $ b2 == as 
-   print b2
-   putStrLn "done"
-
 
 -- A snapshow of learning info on a given point in time
 
