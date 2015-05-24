@@ -70,15 +70,14 @@ instance Binary FromTo where
 data Relations = Relations {
    relation_questionId :: Int,
    relation_points :: FTMap, 
-   relation_nums :: FTMap,
-   relation_max :: FTMap 
+   relation_nums :: FTMap
 } deriving (Show, Eq) 
 
 instance Binary Relations where
-   put Relations{..} = do put relation_questionId; put relation_points; put relation_nums; put relation_max;
-   get = do relation_questionId <- get; relation_points <- get; relation_nums <- get; relation_max <- get; return Relations{..}
+   put Relations{..} = do put relation_questionId; put relation_points; put relation_nums;
+   get = do relation_questionId <- get; relation_points <- get; relation_nums <- get; return Relations{..}
 
-empty_relation qId = Relations qId ftMap ftMap ftMap
+empty_relation qId = Relations qId ftMap ftMap
 
 --- Answer global results
 --- Keeps track of accumulated answers results

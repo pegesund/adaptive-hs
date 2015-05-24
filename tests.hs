@@ -38,11 +38,10 @@ test_relation = do
        relations = empty_relation 10
        relations' = addAnswersToRelations as relations
        relations'' = addAnswersToRelations as2 relations'
-       Relations questionId points nums max = relations''
+       Relations questionId points nums = relations''
    r_points <- Map.lookup (FromTo 10 1) points
    r_nums <- Map.lookup (FromTo 10 1) nums
-   r_max <- Map.lookup (FromTo 10 1) max
-   let res = [r_points, r_nums, r_max]
+   let res = [r_points, r_nums]
    return res
 
 test_answers pupilId = 
@@ -67,7 +66,7 @@ prop_test_answers =
        l = fmap length answerList
     in l == Just 3 
    
-prop_test_relation = test_relation == Just [502,2,9]
+prop_test_relation = test_relation == Just [502,2]
 
 -- Insert 4 answers into an timePoint
 -- Ensure there are 4 after insertion

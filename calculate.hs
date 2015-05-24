@@ -8,8 +8,8 @@ numberOfAnswers answerMap =
    let f answers acc = acc + length answers
     in Map.foldr' f 0 answerMap
 
-answersFromPupilInTimePoint :: IAMap -> Int -> Maybe [Answer]
-answersFromPupilInTimePoint allAnswers pupilId =
+answersFromPupil :: IAMap -> Int -> Maybe [Answer]
+answersFromPupil allAnswers pupilId =
    let answers = Map.lookup pupilId allAnswers
      in answers
 

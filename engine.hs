@@ -28,11 +28,10 @@ addAnswersToGlobals answers globals =
 
 addAnswersToRelations :: [Answer] -> Relations -> Relations
 addAnswersToRelations answers relations =
-   let Relations questionId points nums max = relations 
+   let Relations questionId points nums = relations 
        points' = updateFTMap points (\a -> answer_points a) answers questionId
        nums' = updateFTMap nums (\_ -> 1) answers questionId
-       max' = updateFTMap max (\a -> answer_max a) answers questionId
-   in Relations questionId points' nums' max' 
+   in Relations questionId points' nums'
 
 addAnswersToTimePoint :: Answers -> TimePoint -> TimePoint
 addAnswersToTimePoint newAnswers timePoint = 
