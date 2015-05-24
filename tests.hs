@@ -44,18 +44,20 @@ test_relation = do
    let res = [r_points, r_nums, r_max]
    return res
 
-test_answers = do
+test_answers pupilId = do
    let a1 = Answer 1 2 3 
-       a2 = Answer 1 5 6 
-       a3 = Answer 2 3 3
+       a2 = Answer 2 5 6 
+       a3 = Answer 3 3 3
        aList = [a1,a2,a3]
-       answers = Answers 10 aList
+       answers = Answers pupilId aList
        timePoint = empty_timepoint (Just 0) (Just 0) (Just 0)
        timePoint' = addAnswersToTimePoint answers timePoint 
     in timePoint'
 
+-- Insert three answers at the same timpoint
+-- Ensure that there are thre answers connected to this person after addition
 prop_test_answers =
-   let TimePoint _ _ _ _ _ answerMap = test_answers
+   let TimePoint _ _ _ _ _ answerMap = test_answers 10
        answerList = Map.lookup 10 answerMap
        l = fmap length answerList
     in l == Just 3 
