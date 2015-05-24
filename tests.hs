@@ -43,6 +43,22 @@ test_relation = do
    r_max <- Map.lookup (FromTo 10 1) max
    let res = [r_points, r_nums, r_max]
    return res
+
+test_answers = do
+   let a1 = Answer 1 2 3 
+       a2 = Answer 1 5 6 
+       a3 = Answer 2 3 3
+       aList = [a1,a2,a3]
+       answers = Answers 10 aList
+       timePoint = empty_timepoint (Just 0) (Just 0) (Just 0)
+       timePoint' = addAnswersToTimePoint answers timePoint 
+    in timePoint'
+
+prop_test_answers =
+   let TimePoint _ _ _ _ _ answerMap = test_answers
+       answerList = Map.lookup 10 answerMap
+       l = fmap length answerList
+    in l == Just 3 
    
 prop_test_relation = test_relation == Just [502,2,9]
 

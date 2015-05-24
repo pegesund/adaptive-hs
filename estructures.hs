@@ -8,6 +8,10 @@ import Data.Time
 import Data.Binary
 import Control.Monad
 
+
+type IAMap = Map.Map Int [Answer]
+iaMap = Map.empty :: IAMap
+
 type IIMap = Map.Map Int Int  
 iiMap = Map.empty :: IIMap
 
@@ -99,8 +103,12 @@ data TimePoint = TimePoint {
    t_week :: Maybe Int,
    t_relation :: Relations,
    t_globals :: Globals,
-   t_answers :: [Answers]
+   t_answers :: IAMap 
 } deriving (Show, Eq)
+
+empty_timepoint year month week = 
+   let t = TimePoint year month week (empty_relation 1) empty_global iaMap
+   in t 
 
 
 ccompare v v' n = let res = compare v v' in if res /= EQ then res else n
