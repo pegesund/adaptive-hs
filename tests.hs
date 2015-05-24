@@ -9,6 +9,7 @@ import Data.Binary
 import Test.QuickCheck.All
 import Control.Monad.IO.Class
 import Data.Maybe
+import Calculate
 
 prop_testGlobals = 
    let a1 = Answer 1 1 1
@@ -17,7 +18,7 @@ prop_testGlobals =
        as = Answers 10 [a1,a2]
        globals' = addAnswersToGlobals [a1,a2] globals 
        globals'' = addAnswersToGlobals [a1,a2] globals' 
-    in globals'' == Globals {globals_points = Map.fromList [(1,2),(2,4)], globals_max = Map.fromList [(1,2),(2,4)], globals_nums = Map.fromList [(1,2),(2,2)]}
+    in globals'' == Globals {globals_points = Map.fromList [(1,2),(2,4)], globals_max = Map.fromList [(1,1),(2,2)], globals_nums = Map.fromList [(1,2),(2,2)]}
 
 
 prop_test_binary = do
@@ -44,15 +45,19 @@ test_relation = do
    let res = [r_points, r_nums, r_max]
    return res
 
-test_answers pupilId = do
+test_answers pupilId = 
    let a1 = Answer 1 2 3 
        a2 = Answer 2 5 6 
        a3 = Answer 3 3 3
+       a4 = Answer 1 1 3
        aList = [a1,a2,a3]
+       aList2 = [a4]
        answers = Answers pupilId aList
+       answers2 = Answers (pupilId + 1) aList2
        timePoint = empty_timepoint (Just 0) (Just 0) (Just 0)
-       timePoint' = addAnswersToTimePoint answers timePoint 
-    in timePoint'
+       timePoint' = addAnswersToTimePoint answers timePoint
+       timePoint'' =  addAnswersToTimePoint answers2 timePoint'
+    in timePoint''
 
 -- Insert three answers at the same timpoint
 -- Ensure that there are thre answers connected to this person after addition
@@ -63,6 +68,16 @@ prop_test_answers =
     in l == Just 3 
    
 prop_test_relation = test_relation == Just [502,2,9]
+
+-- Insert 4 answers into an timePoint
+-- Ensure there are 4 after insertion
+test_numberOfAnswers =
+   let TimePoint _ _ _ _ _ answerMap = test_answers 10
+       n = numberOfAnswers answerMap
+    in n
+
+prop_test_numberOfAnswers =
+   4 == test_numberOfAnswers  
 
 return []
 runTests = $quickCheckAll

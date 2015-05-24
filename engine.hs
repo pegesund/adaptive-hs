@@ -18,11 +18,12 @@ updateIMap theMap f answers =
 
 addAnswersToGlobals :: [Answer] -> Globals -> Globals 
 addAnswersToGlobals answers globals =
-   let Globals points max nums = globals
+   let Globals points maxP nums = globals
        nums' = updateIMap nums (\_ -> 1) answers 
        points' = updateIMap points (\a -> answer_points a) answers
-       max' = updateIMap points (\a -> answer_max a) answers
-       newGlobals = Globals points' max' nums'
+       maxP' = let f x acc = Map.insert (answer_questionId x) (answer_max x) acc
+                in foldr f maxP answers
+       newGlobals = Globals points' maxP' nums'
    in newGlobals 
 
 addAnswersToRelations :: [Answer] -> Relations -> Relations
@@ -41,3 +42,5 @@ addAnswersToTimePoint newAnswers timePoint =
        globals' = addAnswersToGlobals pupilAnswers globals
        relation' = addAnswersToRelations pupilAnswers relation
    in TimePoint year month week relation' globals' answers' 
+
+   

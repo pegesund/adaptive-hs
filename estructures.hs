@@ -19,6 +19,7 @@ type FTMap = Map.Map FromTo Int
 ftMap = Map.empty :: FTMap
 
 -- Answers, containing all answers from the pupils
+-- Every answer contains the max-score, it is just for simplicity and for keeping the same structere all the way
 
 type Pupil = Int
 
