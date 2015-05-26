@@ -16,15 +16,17 @@ updateIMap theMap f answers =
        theMap' = Map.unionWith (+) theMap $ Map.fromList newNums
    in theMap'
 
-addAnswersToGlobals :: [Answer] -> Globals -> Globals 
+addAnswersToGlobals :: [Answer] -> IGMap -> IGMap 
 addAnswersToGlobals answers globals =
-   let Globals points maxP nums = globals
-       nums' = updateIMap nums (\_ -> 1) answers 
-       points' = updateIMap points (\a -> answer_points a) answers
-       maxP' = let f x acc = Map.insert (answer_questionId x) (answer_max x) acc
-                in foldr f maxP answers
-       newGlobals = Globals points' maxP' nums'
-   in newGlobals 
+  let addGlobals g1 g2 = Globals ((globals_points g1) + (globals_points g2)) ((globals_max g1) + (globals_max g2))  ((globals_nums g1) + (globals_nums g2))
+      updateGlobal g (Just oldVal) = addGlobals g oldVal
+      updateGlobal g Nothing = g
+      f x acc = let qId = answer_questionId x
+                    oldVal = Map.lookup qId acc
+                    newGlobal = Globals (answer_points x) (answer_max x) 1
+                    newMap = Map.insert qId (updateGlobal newGlobal oldVal) acc
+                     in newMap
+      in foldr f globals answers 
 
 addAnswersToRelations :: [Answer] -> Relations -> Relations
 addAnswersToRelations answers relations =

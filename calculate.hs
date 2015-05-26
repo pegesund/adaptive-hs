@@ -13,4 +13,6 @@ answersFromPupil allAnswers pupilId =
    let answers = Map.lookup pupilId allAnswers
      in answers
 
-
+-- answersFromPupilAverage pupil pupilAnswers globals = 
+--	let lookupAnswer qid = Map.lookup qid globals 
+--		averageQid = let 

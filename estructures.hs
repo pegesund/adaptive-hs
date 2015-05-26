@@ -18,6 +18,9 @@ iiMap = Map.empty :: IIMap
 type FTMap = Map.Map FromTo Int
 ftMap = Map.empty :: FTMap
 
+type IGMap = Map.Map Int Globals
+igMap = Map.empty :: IGMap
+
 -- Answers, containing all answers from the pupils
 -- Every answer contains the max-score, it is just for simplicity and for keeping the same structere all the way
 
@@ -84,16 +87,15 @@ empty_relation qId = Relations qId ftMap ftMap
 --- Each time we get an answer from at pupil we update this structure
 
 data Globals = Globals { 
-   globals_points :: IIMap,
-   globals_max :: IIMap,
-   globals_nums :: IIMap 
+   globals_points :: Int,
+   globals_max :: Int,
+   globals_nums :: Int 
 } deriving (Show, Eq) 
 
 instance Binary Globals where
    put Globals{..} = do put globals_points; put globals_max; put globals_nums;
    get = do globals_points <- get; globals_max <- get; globals_nums <- get; return Globals{..}
 
-empty_global = Globals iiMap iiMap iiMap
 
 -- A snapshow of learning info on a given point in time
 
@@ -102,12 +104,12 @@ data TimePoint = TimePoint {
    t_month :: Maybe Int,
    t_week :: Maybe Int,
    t_relation :: Relations,
-   t_globals :: Globals,
+   t_globals :: IGMap,
    t_answers :: IAMap 
 } deriving (Show, Eq)
 
 empty_timepoint year month week = 
-   let t = TimePoint year month week (empty_relation 1) empty_global iaMap
+   let t = TimePoint year month week (empty_relation 1) igMap iaMap
    in t 
 
 
