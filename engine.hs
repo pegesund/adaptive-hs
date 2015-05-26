@@ -18,8 +18,7 @@ updateIMap theMap f answers =
 
 addAnswersToGlobals :: [Answer] -> IGMap -> IGMap 
 addAnswersToGlobals answers globals =
-  let addGlobAns g a = Globals ((globals_points g) + (answer_points a)) ((globals_max g) + (answer_max a))  ((globals_nums g) + 1)
-      updateGlobal a (Just oldVal) = addGlobAns oldVal a
+  let updateGlobal a (Just g) = Globals ((globals_points g) + (answer_points a)) ((globals_max g) + (answer_max a))  ((globals_nums g) + 1)
       updateGlobal a Nothing = Globals (answer_points a) (answer_max a) 1
       f x acc = let qId = answer_questionId x
                     oldVal = Map.lookup qId acc
