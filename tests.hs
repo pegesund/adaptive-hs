@@ -14,11 +14,11 @@ import Calculate
 prop_testGlobals = 
    let a1 = Answer 1 1 1
        a2 = Answer 2 2 2 
-       globals = empty_global
+       globals = igMap
        as = Answers 10 [a1,a2]
        globals' = addAnswersToGlobals [a1,a2] globals 
        globals'' = addAnswersToGlobals [a1,a2] globals' 
-    in globals'' == Globals {globals_points = Map.fromList [(1,2),(2,4)], globals_max = Map.fromList [(1,1),(2,2)], globals_nums = Map.fromList [(1,2),(2,2)]}
+    in globals'' == Map.fromList [(1,Globals {globals_points = 2, globals_max = 2, globals_nums = 2}),(2,Globals {globals_points = 4, globals_max = 4, globals_nums = 2})]
 
 
 prop_test_binary = do
