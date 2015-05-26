@@ -18,13 +18,12 @@ updateIMap theMap f answers =
 
 addAnswersToGlobals :: [Answer] -> IGMap -> IGMap 
 addAnswersToGlobals answers globals =
-  let addGlobals g1 g2 = Globals ((globals_points g1) + (globals_points g2)) ((globals_max g1) + (globals_max g2))  ((globals_nums g1) + (globals_nums g2))
-      updateGlobal g (Just oldVal) = addGlobals g oldVal
-      updateGlobal g Nothing = g
+  let addGlobAns g a = Globals ((globals_points g) + (answer_points a)) ((globals_max g) + (answer_max a))  ((globals_nums g) + 1)
+      updateGlobal a (Just oldVal) = addGlobAns oldVal a
+      updateGlobal a Nothing = Globals (answer_points a) (answer_max a) 1
       f x acc = let qId = answer_questionId x
                     oldVal = Map.lookup qId acc
-                    newGlobal = Globals (answer_points x) (answer_max x) 1
-                    newMap = Map.insert qId (updateGlobal newGlobal oldVal) acc
+                    newMap = Map.insert qId (updateGlobal x oldVal) acc
                      in newMap
       in foldr f globals answers 
 
