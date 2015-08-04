@@ -3,9 +3,9 @@ import Estructures
 import qualified Data.Map.Strict as Map
 
 
-updateFTMap :: FTMap -> (Answer -> Int) -> [Answer] -> Int -> FTMap
-updateFTMap theMap f answers fromId =
-   let newNums = map (\a -> (FromTo fromId $ answer_questionId a, f a)) answers
+updateRelations :: IIMap -> (Answer -> Int) -> [Answer] -> Int -> IIMap
+updateRelations theMap f answers fromId =
+   let newNums = map (\a -> (answer_questionId a, f a)) answers
        theMap' = Map.unionWith (+) theMap $ Map.fromList newNums
    in theMap'
 
@@ -29,17 +29,18 @@ addAnswersToGlobals answers globals =
 addAnswersToRelations :: [Answer] -> Relations -> Relations
 addAnswersToRelations answers relations =
    let Relations questionId points nums = relations 
-       points' = updateFTMap points (\a -> answer_points a) answers questionId
-       nums' = updateFTMap nums (\_ -> 1) answers questionId
+       points' = updateIMap points (\a -> answer_points a) answers
+       nums' = updateIMap nums (\_ -> 1) answers
    in Relations questionId points' nums'
 
 addAnswersToTimePoint :: Answers -> TimePoint -> TimePoint
 addAnswersToTimePoint newAnswers timePoint = 
    let Answers pupil pupilAnswers = newAnswers 
-       TimePoint year month week relation globals answers = timePoint 
+       TimePoint year month week allRelations globals answers = timePoint 
        answers' = Map.insertWith (++) pupil pupilAnswers answers
        globals' = addAnswersToGlobals pupilAnswers globals
-       relation' = addAnswersToRelations pupilAnswers relation
-   in TimePoint year month week relation' globals' answers' 
+       allRelations' = let oldRelation = Map.lookup  
+       -- relation' = addAnswersToRelations pupilAnswers relation
+   in TimePoint year month week relation globals' answers' 
 
    

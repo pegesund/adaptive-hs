@@ -39,8 +39,8 @@ test_relation = do
        relations' = addAnswersToRelations as relations
        relations'' = addAnswersToRelations as2 relations'
        Relations questionId points nums = relations''
-   r_points <- Map.lookup (FromTo 10 1) points
-   r_nums <- Map.lookup (FromTo 10 1) nums
+   r_points <- Map.lookup 1 points
+   r_nums <- Map.lookup 1 nums
    let res = [r_points, r_nums]
    return res
 

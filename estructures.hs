@@ -15,11 +15,11 @@ iaMap = Map.empty :: IAMap
 type IIMap = Map.Map Int Int  
 iiMap = Map.empty :: IIMap
 
-type FTMap = Map.Map FromTo Int
-ftMap = Map.empty :: FTMap
-
 type IGMap = Map.Map Int Globals
 igMap = Map.empty :: IGMap
+
+type AllRelations = Map.Map Int Relations
+newAllRelations = Map.empty :: AllRelations
 
 -- Answers, containing all answers from the pupils
 -- Every answer contains the max-score, it is just for simplicity and for keeping the same structere all the way
@@ -49,22 +49,6 @@ instance Binary Answers where
              return res
 
 
---- FromTo questionId
---- Used to connect the different questions
---- Think of it as neurones
-
-data FromTo = FromTo {
-   ft_from :: Int,
-   ft_to :: Int
-} deriving (Eq, Ord)
-
-instance Show FromTo where
-   show FromTo{..} = show ft_from ++ "-" ++ show ft_to
-
-instance Binary FromTo where
-   put FromTo{..} = do put ft_from; put ft_to;
-   get = do ft_from <- get; ft_to <- get; return FromTo{..} 
-
 --- Answer relations
 --- Each realation is between a question and all answers that can be connected to that question
 --- The base for the connections are found in the answer datatype
@@ -72,15 +56,15 @@ instance Binary FromTo where
 
 data Relations = Relations {
    relation_questionId :: Int,
-   relation_points :: FTMap, 
-   relation_nums :: FTMap
+   relation_points :: IIMap, 
+   relation_nums :: IIMap
 } deriving (Show, Eq) 
 
 instance Binary Relations where
    put Relations{..} = do put relation_questionId; put relation_points; put relation_nums;
    get = do relation_questionId <- get; relation_points <- get; relation_nums <- get; return Relations{..}
 
-empty_relation qId = Relations qId ftMap ftMap
+empty_relation qId = Relations qId iiMap iiMap
 
 --- Answer global results
 --- Keeps track of accumulated answers results
@@ -91,6 +75,7 @@ data Globals = Globals {
    globals_max :: Int,
    globals_nums :: Int 
 } deriving (Show, Eq) 
+
 
 instance Binary Globals where
    put Globals{..} = do put globals_points; put globals_max; put globals_nums;
@@ -103,13 +88,13 @@ data TimePoint = TimePoint {
    t_year :: Maybe Int,
    t_month :: Maybe Int,
    t_week :: Maybe Int,
-   t_relation :: Relations,
+   t_all_relations :: AllRelations,
    t_globals :: IGMap,
    t_answers :: IAMap 
 } deriving (Show, Eq)
 
 empty_timepoint year month week = 
-   let t = TimePoint year month week (empty_relation 1) igMap iaMap
+   let t = TimePoint year month week newAllRelations igMap iaMap
    in t 
 
 
