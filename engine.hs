@@ -33,13 +33,16 @@ addAnswersToRelations answers relations =
        nums' = updateIMap nums (\_ -> 1) answers
    in Relations questionId points' nums'
 
+addAnswersToAllRelations :: Answers -> AllReleations -> AllReleations
+addAnswersToAllRelations amswers allRelations =
+
 addAnswersToTimePoint :: Answers -> TimePoint -> TimePoint
 addAnswersToTimePoint newAnswers timePoint = 
    let Answers pupil pupilAnswers = newAnswers 
        TimePoint year month week allRelations globals answers = timePoint 
        answers' = Map.insertWith (++) pupil pupilAnswers answers
        globals' = addAnswersToGlobals pupilAnswers globals
-       allRelations' = let oldRelation = Map.lookup  
+       -- allRelations' = let oldRelation = Map.lookup  
        -- relation' = addAnswersToRelations pupilAnswers relation
    in TimePoint year month week relation globals' answers' 
 
