@@ -1,5 +1,6 @@
 module Engine where
 import Estructures
+import Data.Foldable as Foldable
 import qualified Data.Map.Strict as Map
 
 
@@ -24,7 +25,7 @@ addAnswersToGlobals answers globals =
                     oldVal = Map.lookup qId acc
                     newMap = Map.insert qId (updateGlobal x oldVal) acc
                      in newMap
-      in foldr f globals answers 
+      in Foldable.foldr' f globals answers 
 
 addAnswersToRelations :: [Answer] -> Relations -> Relations
 addAnswersToRelations answers relations =
@@ -33,8 +34,23 @@ addAnswersToRelations answers relations =
        nums' = updateIMap nums (\_ -> 1) answers
    in Relations questionId points' nums'
 
-addAnswersToAllRelations :: Answers -> AllReleations -> AllReleations
-addAnswersToAllRelations amswers allRelations =
+addAnswersToAllRelations :: [Answer] -> Int -> AllRelations -> IAMap -> AllRelations
+addAnswersToAllRelations answers pupilId allRelations allAnswers =
+  let pupilAnswers = Map.lookup pupilId allAnswers
+      answersTo = case pupilAnswers of
+        Just pa -> pa
+        Nothing -> []
+      answerPermutations = [(i,answersTo) | i <- answers] ++ [(i,answers) | i <- answersTo]
+      addToRelation (fromAnswer, toAnswers) acc = 
+        let fromAnswer_id = answer_questionId fromAnswer
+            relations = Map.lookup fromAnswer_id acc
+            acc' = case relations of
+              Just oldR -> Map.insert fromAnswer_id relations' acc where
+                relations' = addAnswersToRelations toAnswers oldR
+              Nothing -> Map.insert fromAnswer_id relations' acc where
+                relations' = addAnswersToRelations toAnswers (empty_relation fromAnswer_id)
+        in acc'
+      in Foldable.foldr' addToRelation allRelations answerPermutations
 
 addAnswersToTimePoint :: Answers -> TimePoint -> TimePoint
 addAnswersToTimePoint newAnswers timePoint = 
@@ -44,6 +60,6 @@ addAnswersToTimePoint newAnswers timePoint =
        globals' = addAnswersToGlobals pupilAnswers globals
        -- allRelations' = let oldRelation = Map.lookup  
        -- relation' = addAnswersToRelations pupilAnswers relation
-   in TimePoint year month week relation globals' answers' 
+   in TimePoint year month week allRelations globals' answers' 
 
    

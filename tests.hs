@@ -78,6 +78,22 @@ test_numberOfAnswers =
 prop_test_numberOfAnswers =
    4 == test_numberOfAnswers  
 
+
+test_all_relations =
+   let allRelations = newAllRelations
+       a1 = Answer 1 1 1 
+       a2 = Answer 2 1 1 
+       a3 = Answer 3 1 1
+       aList = [a1,a2]
+       aList2 = [a3]
+       pupilId = 1
+       allAnswers = iaMap
+       allAnswers' = Map.insertWith (++) pupilId aList allAnswers
+       allRelations' = addAnswersToAllRelations aList2 pupilId allRelations allAnswers'
+       allRelations'' = addAnswersToAllRelations aList2 pupilId allRelations' allAnswers'
+    in allRelations''
+
+
 return []
 runTests = $quickCheckAll
 
