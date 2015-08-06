@@ -21,6 +21,12 @@ igMap = Map.empty :: IGMap
 type AllRelations = Map.Map Int Relations
 newAllRelations = Map.empty :: AllRelations
 
+-- A tag is connected to a question in a many-to-many-relation
+-- A tags simpli tags questions
+
+type Tags = Map.Map String [Int]
+newTags = Map.empty :: Tags
+
 -- Answers, containing all answers from the pupils
 -- Every answer contains the max-score, it is just for simplicity and for keeping the same structere all the way
 
@@ -90,19 +96,21 @@ data TimePoint = TimePoint {
    t_week :: Maybe Int,
    t_all_relations :: AllRelations,
    t_globals :: IGMap,
-   t_answers :: IAMap 
+   t_answers :: IAMap,
+   t_tags :: Tags 
 } deriving (Show, Eq)
 
 empty_timepoint year month week = 
-   let t = TimePoint year month week newAllRelations igMap iaMap
+   let t = TimePoint year month week newAllRelations igMap iaMap newTags
    in t 
 
 
 ccompare v v' n = let res = compare v v' in if res /= EQ then res else n
 
 instance Ord TimePoint where
-   (TimePoint year month week _ _ _) `compare` (TimePoint year' month' week' _ _ _) = 
+   (TimePoint year month week _ _ _ _) `compare` (TimePoint year' month' week' _ _ _ _) = 
 	ccompare year year' $ ccompare month month' $ ccompare week week' EQ 
+
 
 
 main2 = do

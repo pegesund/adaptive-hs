@@ -55,11 +55,16 @@ addAnswersToAllRelations answers pupilId allRelations allAnswers =
 addAnswersToTimePoint :: Answers -> TimePoint -> TimePoint
 addAnswersToTimePoint newAnswers timePoint = 
    let Answers pupil pupilAnswers = newAnswers 
-       TimePoint year month week allRelations globals answers = timePoint 
+       TimePoint year month week allRelations globals answers tags = timePoint 
        answers' = Map.insertWith (++) pupil pupilAnswers answers
        globals' = addAnswersToGlobals pupilAnswers globals
-       -- allRelations' = let oldRelation = Map.lookup  
-       -- relation' = addAnswersToRelations pupilAnswers relation
-   in TimePoint year month week allRelations globals' answers' 
+       allRelations' = addAnswersToAllRelations pupilAnswers pupil allRelations answers
+   in TimePoint year month week allRelations' globals' answers' tags
+
+
+addTagToQuestion :: Tags -> String -> Int -> Tags
+addTagToQuestion tags tag qid =
+  Map.unionWith addWithoutDuplicates tags $ Map.fromList [(tag, [qid])] where
+    addWithoutDuplicates a b = if Prelude.elem (head a) b then b else a ++ b
 
    
