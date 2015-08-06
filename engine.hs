@@ -40,13 +40,13 @@ addAnswersToAllRelations answers pupilId allRelations allAnswers =
       answersTo = case pupilAnswers of
         Just pa -> pa
         Nothing -> []
-      answerPermutations = [(i,answersTo) | i <- answers] ++ [(i,answers) | i <- answersTo]
+      answerPermutations = [(i,answersTo) | i <- answers] ++ [(i,answers) | i <- answersTo] ++ [(i, filter (\a -> i /= a) answersTo) | i <- answersTo]
       addToRelation (fromAnswer, toAnswers) acc = 
         let fromAnswer_id = answer_questionId fromAnswer
             relations = Map.lookup fromAnswer_id acc
             acc' = case relations of
               Just oldR -> Map.insert fromAnswer_id relations' acc where
-                relations' = addAnswersToRelations toAnswers oldR
+                relations' = addAnswersToRelations (filter (\a -> a /= fromAnswer) toAnswers) oldR
               Nothing -> Map.insert fromAnswer_id relations' acc where
                 relations' = addAnswersToRelations toAnswers (empty_relation fromAnswer_id)
         in acc'

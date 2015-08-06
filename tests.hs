@@ -10,6 +10,7 @@ import Test.QuickCheck.All
 import Control.Monad.IO.Class
 import Data.Maybe
 import Calculate
+import Data.Map.Strict
 
 prop_testGlobals = 
    let a1 = Answer 1 1 1
@@ -91,7 +92,19 @@ test_all_relations =
        allAnswers' = Map.insertWith (++) pupilId aList allAnswers
        allRelations' = addAnswersToAllRelations aList2 pupilId allRelations allAnswers'
        allRelations'' = addAnswersToAllRelations aList2 pupilId allRelations' allAnswers'
-    in allRelations''
+       allRelations''' = addAnswersToAllRelations aList2 pupilId allRelations'' allAnswers'
+       allRelations'''' = addAnswersToAllRelations aList2 pupilId allRelations''' allAnswers'
+    in allRelations''''
+
+
+-- Insert some ansers into relations
+-- Make sure binding are counted correct
+-- For example should the binding-value between answer-1 and answer-2 increase if they was solved toghter
+-- What is caught in the relation is number of points, and the possible max-points
+prop_test_all_relations =
+  let r = test_all_relations
+      three = Map.lookup 3 r
+  in three == Just (Relations {relation_questionId = 3, relation_points = fromList [(1,4),(2,4)], relation_nums = fromList [(1,4),(2,4)]})
 
 
 return []
