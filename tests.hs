@@ -119,6 +119,19 @@ test_tags_insert =
 prop_test_tags_insert =
   test_tags_insert == fromList [("a",[1]),("b",[2,1])]  
 
+-- Test average score on a question 
+test_averageScoreOnQuestion =
+   let a1 = Answer 1 6 10
+       a2 = Answer 1 8 10
+       globals = igMap
+       as = Answers 10 [a1,a2]
+       globals' = addAnswersToGlobals [a1,a2] globals 
+       score = averageScoreOnQuestion globals' 1
+    in score
+
+prop_test_averageScoreOnQuestion = 
+  test_averageScoreOnQuestion == (7.0,10.0)
+
 return []
 runTests = $quickCheckAll
 
