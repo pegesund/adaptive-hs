@@ -111,6 +111,18 @@ instance Ord TimePoint where
    (TimePoint year month week _ _ _ _) `compare` (TimePoint year' month' week' _ _ _ _) = 
 	ccompare year year' $ ccompare month month' $ ccompare week week' EQ 
 
+-- Score: how good a pupil has scored on a question
+
+data PupilScore = PupilScore {
+    ps_qid :: Int,
+    ps_points :: Double,
+    ps_max :: Double,
+    ps_score :: Double
+     } deriving (Show, Eq)
+
+instance Ord PupilScore where
+  (PupilScore _ _ _ score1) `compare` (PupilScore _ _ _ score2) = 
+    score1 `compare` score2
 
 
 main2 = do
