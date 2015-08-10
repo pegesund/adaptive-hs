@@ -40,3 +40,23 @@ findPupilsWeakSpots globals allAnswers pupilId =
 			            in PupilScore qid points mx score
 			l = map oneRes answers
 			sortedList = sort l
+
+smoothPupilWeakSpots :: IGMap -> SmootType -> [PupilScore] -> [PupilScore]
+smoothPupilWeakSpots globals sfactor pupilScores =
+	case sfactor of
+	   SmoothPercentage f -> pupilScore' where
+	   		sumPoints = Map.foldr (\g acc -> acc + globals_nums g) 0 globals
+	   		pupilScore' = filter (hasHigerPrecentage f) pupilScores
+	   		hasHigerPrecentage f pupilScore = f >= 100.0 * (getNumGlobal pupilScore) / (fromIntegral sumPoints) 
+	   SmoothAbsolute f -> filter (hasMoreNums f) pupilScores where
+	        hasMoreNums f pupilScore = f >= getNumGlobal pupilScore 
+	where getNumGlobal pupilScore = 
+	       case Map.lookup (ps_qid pupilScore) globals of
+	         Nothing -> error "Inconsistent data in smoothPupilWeakSpots" 
+	         Just g -> fromIntegral $ globals_nums g	    
+
+
+
+
+
+

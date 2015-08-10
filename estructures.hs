@@ -124,6 +124,10 @@ instance Ord PupilScore where
   (PupilScore _ _ _ score1) `compare` (PupilScore _ _ _ score2) = 
     score1 `compare` score2
 
+-- smoother
+
+data SmootType = SmoothPercentage Double | SmoothAbsolute Double
+
 
 main2 = do
    putStrLn "Life is short"
