@@ -62,7 +62,7 @@ test_answers pupilId =
 -- Insert three answers at the same timpoint
 -- Ensure that there are thre answers connected to this person after addition
 prop_test_answers =
-   let TimePoint _ _ _ _ _ answerMap _ = test_answers 10
+   let TimePoint _ _ _ _ _ answerMap = test_answers 10
        answerList = Map.lookup 10 answerMap
        l = fmap length answerList
     in l == Just 3 
@@ -72,7 +72,7 @@ prop_test_relation = test_relation == Just [502,2]
 -- Insert 4 answers into an timePoint
 -- Ensure there are 4 after insertion
 test_numberOfAnswers =
-   let TimePoint _ _ _ _ _ answerMap _ = test_answers 10
+   let TimePoint _ _ _ _ _ answerMap = test_answers 10
        n = numberOfAnswers answerMap
     in n
 
@@ -106,31 +106,6 @@ prop_test_all_relations =
       three = Map.lookup 3 r
   in three == Just (Relations {relation_questionId = 3, relation_points = fromList [(1,4),(2,4)], relation_nums = fromList [(1,4),(2,4)]})
 
--- Add a two tags to a question, verify they are stored
--- avoid duplicates
-test_tags_insert =
-  let tags = newTags
-      tags' = addTagToQuestion tags "a" 1
-      tags'' = addTagToQuestion tags' "b" 2
-      tags''' = addTagToQuestion tags'' "b" 1
-      tags'''' = addTagToQuestion tags'' "b" 1
-  in tags''''
-
-prop_test_tags_insert =
-  test_tags_insert == fromList [("a",[1]),("b",[2,1])]  
-
--- Test average score on a question 
-test_averageScoreOnQuestion =
-   let a1 = Answer 1 6 10
-       a2 = Answer 1 8 10
-       globals = igMap
-       as = Answers 10 [a1,a2]
-       globals' = addAnswersToGlobals [a1,a2] globals 
-       score = averageScoreOnQuestion globals' 1
-    in score
-
-prop_test_averageScoreOnQuestion = 
-  test_averageScoreOnQuestion == (7.0,10.0)
 
 return []
 runTests = $quickCheckAll
