@@ -62,7 +62,7 @@ test_answers pupilId =
 -- Insert three answers at the same timpoint
 -- Ensure that there are thre answers connected to this person after addition
 prop_test_answers =
-   let TimePoint _ _ _ _ _ answerMap = test_answers 10
+   let TimePoint _ _ _ _ _ answerMap _ = test_answers 10
        answerList = Map.lookup 10 answerMap
        l = fmap length answerList
     in l == Just 3 
@@ -72,7 +72,7 @@ prop_test_relation = test_relation == Just [502,2]
 -- Insert 4 answers into an timePoint
 -- Ensure there are 4 after insertion
 test_numberOfAnswers =
-   let TimePoint _ _ _ _ _ answerMap = test_answers 10
+   let TimePoint _ _ _ _ _ answerMap _ = test_answers 10
        n = numberOfAnswers answerMap
     in n
 
