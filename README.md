@@ -1,1 +1,1 @@
-# better-learn
+# adaptive-hs
