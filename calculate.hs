@@ -25,9 +25,9 @@ averageScoreOnQuestion globals qid =
 	  	nums = fromIntegral (globals_nums g)
 	  	avg = (fromIntegral (globals_points g)) / nums
 	   	mx = (fromIntegral (globals_max g)) / nums
-	    
+
 -- Returns a list of (qustionId, pointsScored, score)
--- higher score is better		 
+-- higher score is better
 findPupilsWeakSpots :: IGMap -> IAMap -> Int -> [PupilScore]
 findPupilsWeakSpots globals allAnswers pupilId =
 	let maybeAnswers = Map.lookup pupilId allAnswers
@@ -53,7 +53,7 @@ smoothPupilWeakSpots globals sfactor pupilScores =
 	where getNumGlobal pupilScore = 
 	       case Map.lookup (ps_qid pupilScore) globals of
 	         Nothing -> error "Inconsistent data in smoothPupilWeakSpots" 
-	         Just g -> fromIntegral $ globals_nums g	    
+	         Just g -> fromIntegral $ globals_nums g
 
 
 
