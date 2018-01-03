@@ -7,6 +7,9 @@ import qualified Data.Map.Strict as Map
 import Data.Time
 import Data.Binary
 
+{-# ANN module "HLint: ignore Use camelCase" #-} 
+
+
 -- Keeps the answeris of each pupil in the form pupilid - answers
 type IAMap = Map.Map Int [Answer]
 iaMap::IAMap

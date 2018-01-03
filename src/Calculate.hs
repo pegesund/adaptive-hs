@@ -22,8 +22,8 @@ averageScoreOnQuestion globals qid =
           Nothing -> error "Trying to calculate on non existing question"
           Just g -> (avg, mx, nums) where
                 nums = fromIntegral (globals_nums g)
-                avg = (globals_points g) / nums
-                mx = (fromIntegral (globals_max g)) / nums
+                avg = globals_points g / nums
+                mx = fromIntegral (globals_max g) / nums
 
 -- Returns a list of (qustionId, pointsScored, score)
 -- higher score is better
@@ -46,7 +46,7 @@ smoothPupilWeakSpots globals sfactor pupilScores =
            SmoothPercentage f -> pupilScore' where
                         sumPoints = Map.foldr (\g acc -> acc + globals_nums g) 0 globals
                         pupilScore' = filter (hasHigerPrecentage f) pupilScores
-                        hasHigerPrecentage _f pupilScore = _f >= 100.0 * (getNumGlobal pupilScore) / (fromIntegral sumPoints) 
+                        hasHigerPrecentage _f pupilScore = _f >= 100.0 * getNumGlobal pupilScore / fromIntegral sumPoints 
            SmoothAbsolute f -> filter (hasMoreNums f) pupilScores where
                 hasMoreNums _f pupilScore = _f >= getNumGlobal pupilScore 
         where getNumGlobal pupilScore = 
