@@ -20,7 +20,7 @@ prop_testGlobals =
     in globals'' == Map.fromList [(1,Globals {globals_points = 2, globals_max = 1, globals_nums = 2}),(2,Globals {globals_points = 4, globals_max = 1, globals_nums = 2})]
 
 prop_test_binary::Bool
-prop_test_binary = do
+prop_test_binary = 
    let a1 = Answer 1 2
        a2 = Answer 4 5
        as = Answers 10 [a1,a2]
@@ -28,8 +28,8 @@ prop_test_binary = do
        b2 = decode b1::Answers
     in b2 == as
 
-test_relation::Maybe (Double, Int)
-test_relation = do
+testRelation::Maybe (Double, Int)
+testRelation = do 
    let a1 = Answer 1 2
        a2 = Answer 4 5
        a3 = Answer 1 500
@@ -44,8 +44,8 @@ test_relation = do
    let res = (r_points, r_nums)
    return res
 
-test_answers::Int -> TimePoint
-test_answers pupilId =
+testAnswers::Int -> TimePoint
+testAnswers pupilId =
    let a1 = Answer 1 2
        a2 = Answer 2 5
        a3 = Answer 3 3
@@ -63,27 +63,27 @@ test_answers pupilId =
 -- Ensure that there are thre answers connected to this person after addition
 prop_test_answers::Bool
 prop_test_answers =
-   let TimePoint _ _ _ _ _ answerMap _ = test_answers 10
+   let TimePoint _ _ _ _ _ answerMap _ = testAnswers 10
        answerList = Map.lookup 10 answerMap
        l = fmap length answerList
     in l == Just 3
 
 prop_test_relation::Bool
-prop_test_relation = test_relation == Just (502,2)
+prop_test_relation = testRelation == Just (502,2)
 
 -- Insert 4 answers into an timePoint
 -- Ensure there are 4 after insertion
-test_numberOfAnswers::Int
-test_numberOfAnswers =
-   let TimePoint _ _ _ _ _ answerMap _ = test_answers 10
+testNumberOfAnswers::Int
+testNumberOfAnswers =
+   let TimePoint _ _ _ _ _ answerMap _ = testAnswers 10
     in numberOfAnswers answerMap
 
 prop_test_numberOfAnswers::Bool
 prop_test_numberOfAnswers =
-   4 == test_numberOfAnswers
+   4 == testNumberOfAnswers
 
-test_all_relations::AllRelations
-test_all_relations =
+testAllRelations::AllRelations
+testAllRelations =
    let allRelations = newAllRelations
        a1 = Answer 1 1
        a2 = Answer 2 1
@@ -106,9 +106,9 @@ test_all_relations =
 -- What is caught in the relation is number of points, and the possible max-points
 prop_test_all_relations::Bool
 prop_test_all_relations =
-  let r = test_all_relations
+  let r = testAllRelations
       three = Map.lookup 3 r
-  in three == Just (Relations {relation_questionId = 3, relation_points = fromList [(1,4),(2,4)], relation_nums = fromList [(1,4),(2,4)]})
+  in three == Just Relations {relation_questionId = 3, relation_points = fromList [(1,4),(2,4)], relation_nums = fromList [(1,4),(2,4)]}
 
 return []
 runTests::IO Bool
