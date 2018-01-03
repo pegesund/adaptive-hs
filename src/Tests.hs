@@ -11,28 +11,28 @@ import Data.Map.Strict
 
 prop_testGlobals::Bool
 prop_testGlobals =
-   let a1 = Answer 1 1 1
-       a2 = Answer 2 2 2
+   let a1 = Answer 1 1 
+       a2 = Answer 2 2
        globals = igMap
        _as = Answers 10 [a1,a2]
        globals' = addAnswersToGlobals [a1,a2] globals 
        globals'' = addAnswersToGlobals [a1,a2] globals' 
-    in globals'' == Map.fromList [(1,Globals {globals_points = 2, globals_max = 2, globals_nums = 2}),(2,Globals {globals_points = 4, globals_max = 4, globals_nums = 2})]
+    in globals'' == Map.fromList [(1,Globals {globals_points = 2, globals_max = 1, globals_nums = 2}),(2,Globals {globals_points = 4, globals_max = 1, globals_nums = 2})]
 
 prop_test_binary::Bool
 prop_test_binary = do
-   let a1 = Answer 1 2 3
-       a2 = Answer 4 5 6
+   let a1 = Answer 1 2
+       a2 = Answer 4 5
        as = Answers 10 [a1,a2]
        b1 = encode as
        b2 = decode b1::Answers
     in b2 == as
 
-test_relation::Maybe [Int]
+test_relation::Maybe (Double, Int)
 test_relation = do
-   let a1 = Answer 1 2 3
-       a2 = Answer 4 5 6
-       a3 = Answer 1 500 6
+   let a1 = Answer 1 2
+       a2 = Answer 4 5
+       a3 = Answer 1 500
        as = [a1,a2]
        as2 = [a3]
        relations = empty_relation 10
@@ -41,15 +41,15 @@ test_relation = do
        Relations _questionId points nums = relations''
    r_points <- Map.lookup 1 points
    r_nums <- Map.lookup 1 nums
-   let res = [r_points, r_nums]
+   let res = (r_points, r_nums)
    return res
 
 test_answers::Int -> TimePoint
 test_answers pupilId =
-   let a1 = Answer 1 2 3
-       a2 = Answer 2 5 6
-       a3 = Answer 3 3 3
-       a4 = Answer 1 1 3
+   let a1 = Answer 1 2
+       a2 = Answer 2 5
+       a3 = Answer 3 3
+       a4 = Answer 1 1
        aList = [a1,a2,a3]
        aList2 = [a4]
        answers = Answers pupilId aList
@@ -69,7 +69,7 @@ prop_test_answers =
     in l == Just 3
 
 prop_test_relation::Bool
-prop_test_relation = test_relation == Just [502,2]
+prop_test_relation = test_relation == Just (502,2)
 
 -- Insert 4 answers into an timePoint
 -- Ensure there are 4 after insertion
@@ -85,9 +85,9 @@ prop_test_numberOfAnswers =
 test_all_relations::AllRelations
 test_all_relations =
    let allRelations = newAllRelations
-       a1 = Answer 1 1 30
-       a2 = Answer 2 1 20 
-       a3 = Answer 3 1 10
+       a1 = Answer 1 1
+       a2 = Answer 2 1
+       a3 = Answer 3 1
        aList = [a1,a2]
        aList2 = [a3]
        pupilId = 1

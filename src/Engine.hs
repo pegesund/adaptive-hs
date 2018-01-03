@@ -4,23 +4,23 @@ import Data.Foldable as Foldable
 import qualified Data.Map.Strict as Map
 
 
-updateRelations :: IIMap -> (Answer -> Int) -> [Answer] -> Int -> IIMap
+updateRelations :: Num b => Map.Map Int b -> (Answer -> b) -> [Answer] -> p -> Map.Map Int b  
 updateRelations theMap f answers _fromId =
    let newNums = map (\a -> (answer_questionId a, f a)) answers
        theMap' = Map.unionWith (+) theMap $ Map.fromList newNums
    in theMap'
 
 
-updateIMap :: IIMap -> (Answer -> Int) -> [Answer] -> IIMap
-updateIMap theMap f answers =
+updateMap :: Num b => Map.Map Int b -> (Answer -> b) -> [Answer] -> Map.Map Int b
+updateMap theMap f answers =
    let newNums = map (\a -> (answer_questionId a, f a)) answers
        theMap' = Map.unionWith (+) theMap $ Map.fromList newNums
    in theMap'
 
 addAnswersToGlobals :: [Answer] -> IGMap -> IGMap
 addAnswersToGlobals answers globals =
-  let updateGlobal a (Just g) = Globals ((globals_points g) + (answer_points a)) ((globals_max g) + (answer_max a))  ((globals_nums g) + 1)
-      updateGlobal a Nothing = Globals (answer_points a) (answer_max a) 1
+  let updateGlobal a (Just g) = Globals ((globals_points g) + (answer_points a)) (globals_max g) ((globals_nums g) + 1)
+      updateGlobal a Nothing = Globals (answer_points a) 1 1
       f x acc = let qId = answer_questionId x
                     oldVal = Map.lookup qId acc
                     newMap = Map.insert qId (updateGlobal x oldVal) acc
@@ -30,8 +30,8 @@ addAnswersToGlobals answers globals =
 addAnswersToRelations :: [Answer] -> Relations -> Relations
 addAnswersToRelations answers relations =
    let Relations questionId points nums = relations
-       points' = updateIMap points (\a -> answer_points a) answers
-       nums' = updateIMap nums (\_ -> 1) answers
+       points' = updateMap points (\a -> answer_points a) answers
+       nums' = updateMap nums (\_ -> 1) answers
    in Relations questionId points' nums'
 
 addAnswersToAllRelations :: [Answer] -> Int -> AllRelations -> IAMap -> AllRelations

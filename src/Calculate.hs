@@ -22,7 +22,7 @@ averageScoreOnQuestion globals qid =
           Nothing -> error "Trying to calculate on non existing question"
           Just g -> (avg, mx, nums) where
                 nums = fromIntegral (globals_nums g)
-                avg = (fromIntegral (globals_points g)) / nums
+                avg = (globals_points g) / nums
                 mx = (fromIntegral (globals_max g)) / nums
 
 -- Returns a list of (qustionId, pointsScored, score)
@@ -34,7 +34,7 @@ findPupilsWeakSpots globals allAnswers pupilId =
                 Nothing -> []
                 Just answers -> sortedList where
                         oneRes a = let qid = answer_questionId a
-                                       points = fromIntegral (answer_points a)
+                                       points = answer_points a
                                        (score, mx) = let (avg,_mx,_nums) = averageScoreOnQuestion globals qid in (points/avg, _mx)
                                     in PupilScore qid points mx score
                         l = map oneRes answers

@@ -18,6 +18,12 @@ type IIMap = Map.Map Int Int
 iiMap::IIMap
 iiMap = Map.empty
 
+
+-- Map of integer - double
+type IDMap = Map.Map Int Double
+idMap::IDMap
+idMap = Map.empty
+
 -- Map of questionid - global
 -- Global keeps track of invidual statistics for a question
 type IGMap = Map.Map Int Globals
@@ -44,13 +50,12 @@ type Pupil = Int
 
 data Answer = Answer {
    answer_questionId :: Int,
-   answer_points :: Int,
-   answer_max :: Int
+   answer_points :: Double
 } deriving (Show, Eq)
 
 instance Binary Answer where
-   put Answer{..} = do put answer_questionId; put answer_points; put answer_max
-   get = do answer_questionId <- get; answer_points <- get; answer_max <- get; return Answer{..}
+   put Answer{..} = do put answer_questionId; put answer_points
+   get = do answer_questionId <- get; answer_points <- get; return Answer{..}
 
 data Answers = Answers Pupil [Answer] deriving (Eq)
 
@@ -75,7 +80,7 @@ instance Binary Answers where
 
 data Relations = Relations {
    relation_questionId :: Int,
-   relation_points :: IIMap,
+   relation_points :: IDMap,
    relation_nums :: IIMap
 } deriving (Show, Eq)
 
@@ -84,7 +89,7 @@ instance Binary Relations where
    get = do relation_questionId <- get; relation_points <- get; relation_nums <- get; return Relations{..}
 
 empty_relation::Int -> Relations
-empty_relation qId = Relations qId iiMap iiMap
+empty_relation qId = Relations qId idMap iiMap
 
 --- Answer global results
 --- Keeps track of accumulated answers results
@@ -94,11 +99,11 @@ empty_relation qId = Relations qId iiMap iiMap
 --- numb = number of pupils
 
 
-data Globals = Globals { 
-   globals_points :: Int,
+data Globals = Globals {
+   globals_points :: Double,
    globals_max :: Int,
-   globals_nums :: Int 
-} deriving (Show, Eq) 
+   globals_nums :: Int
+} deriving (Show, Eq)
 
 
 instance Binary Globals where
