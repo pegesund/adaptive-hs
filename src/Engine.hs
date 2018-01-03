@@ -53,9 +53,9 @@ addAnswersToAllRelations answers pupilId allRelations allAnswers =
       in Foldable.foldr' addToRelation allRelations answerPermutations
 
 addAnswersToTimePoint :: Answers -> TimePoint -> TimePoint
-addAnswersToTimePoint newAnswers timePoint = 
-   let Answers pupil pupilAnswers = newAnswers 
-       TimePoint year month week allRelations globals answers tags = timePoint 
+addAnswersToTimePoint newAnswers timePoint =
+   let Answers pupil pupilAnswers = newAnswers
+       TimePoint year month week allRelations globals answers tags = timePoint
        answers' = Map.insertWith (++) pupil pupilAnswers answers
        globals' = addAnswersToGlobals pupilAnswers globals
        allRelations' = addAnswersToAllRelations pupilAnswers pupil allRelations answers
@@ -73,4 +73,4 @@ updateMaxScore questionId maxVal globals =
         newGlobal = case oldGlobal of
            Just (Globals points _max nums) -> Globals points maxVal nums
            Nothing -> Globals 0 maxVal 0
-   in Map.insert questionId newGlobal globals 
+   in Map.insert questionId newGlobal globals
