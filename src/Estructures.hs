@@ -63,7 +63,7 @@ instance Binary Answer where
 data Answers = Answers Pupil [Answer] deriving (Eq)
 
 instance Show Answers where
-   show (Answers pupil answers) = "Pupil-id: " ++ (show pupil) ++ "\n" ++ (concat $ map (\a -> "  " ++ show a ++ "\n") answers) 
+   show (Answers pupil answers) = "Pupil-id: " ++ show pupil ++ "\n" ++ concatMap (\a -> "  " ++ show a ++ "\n") answers 
 
 instance Binary Answers where
     put (Answers pupil answers) = do put pupil; put answers;
