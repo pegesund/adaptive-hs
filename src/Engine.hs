@@ -17,7 +17,7 @@ updateIMap theMap f answers =
        theMap' = Map.unionWith (+) theMap $ Map.fromList newNums
    in theMap'
 
-addAnswersToGlobals :: [Answer] -> IGMap -> IGMap 
+addAnswersToGlobals :: [Answer] -> IGMap -> IGMap
 addAnswersToGlobals answers globals =
   let updateGlobal a (Just g) = Globals ((globals_points g) + (answer_points a)) ((globals_max g) + (answer_max a))  ((globals_nums g) + 1)
       updateGlobal a Nothing = Globals (answer_points a) (answer_max a) 1
@@ -29,7 +29,7 @@ addAnswersToGlobals answers globals =
 
 addAnswersToRelations :: [Answer] -> Relations -> Relations
 addAnswersToRelations answers relations =
-   let Relations questionId points nums = relations 
+   let Relations questionId points nums = relations
        points' = updateIMap points (\a -> answer_points a) answers
        nums' = updateIMap nums (\_ -> 1) answers
    in Relations questionId points' nums'
@@ -41,7 +41,7 @@ addAnswersToAllRelations answers pupilId allRelations allAnswers =
         Just pa -> pa
         Nothing -> []
       answerPermutations = [(i,answersTo) | i <- answers] ++ [(i,answers) | i <- answersTo] ++ [(i, filter (\a -> i /= a) answersTo) | i <- answersTo]
-      addToRelation (fromAnswer, toAnswers) acc = 
+      addToRelation (fromAnswer, toAnswers) acc =
         let fromAnswer_id = answer_questionId fromAnswer
             relations = Map.lookup fromAnswer_id acc
             acc' = case relations of

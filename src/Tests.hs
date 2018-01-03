@@ -85,9 +85,9 @@ prop_test_numberOfAnswers =
 test_all_relations::AllRelations
 test_all_relations =
    let allRelations = newAllRelations
-       a1 = Answer 1 1 1
-       a2 = Answer 2 1 1
-       a3 = Answer 3 1 1
+       a1 = Answer 1 1 30
+       a2 = Answer 2 1 20 
+       a3 = Answer 3 1 10
        aList = [a1,a2]
        aList2 = [a3]
        pupilId = 1
