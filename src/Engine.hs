@@ -67,4 +67,10 @@ addTagToQuestion tags tag qid =
   Map.unionWith addWithoutDuplicates tags $ Map.fromList [(tag, [qid])] where
     addWithoutDuplicates a b = if head a `elem`b then b else a ++ b
 
-
+updateMaxScore :: Int -> Double -> IGMap -> IGMap
+updateMaxScore questionId maxVal globals =
+   let  oldGlobal =  Map.lookup questionId globals
+        newGlobal = case oldGlobal of
+           Just (Globals points _max nums) -> Globals points maxVal nums
+           Nothing -> Globals 0 maxVal 0
+   in Map.insert questionId newGlobal globals 

@@ -104,7 +104,7 @@ empty_relation qId = Relations qId idMap iiMap
 
 data Globals = Globals {
    globals_points :: Double,
-   globals_max :: Int,
+   globals_max :: Double,
    globals_nums :: Int
 } deriving (Show, Eq)
 

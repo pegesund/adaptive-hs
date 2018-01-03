@@ -110,7 +110,14 @@ prop_test_all_relations =
       three = Map.lookup 3 r
   in three == Just Relations {relation_questionId = 3, relation_points = fromList [(1,4),(2,4)], relation_nums = fromList [(1,4),(2,4)]}
 
+prop_test_update_maxScore::Bool
+prop_test_update_maxScore =
+  let globals = igMap
+      globals' = updateMaxScore 1 10.5 globals
+      globals'' = updateMaxScore 1 11.5 globals
+  in globals' == fromList [(1,Globals {globals_points = 0.0, globals_max = 10.5, globals_nums = 0})] &&
+     globals''== fromList [(1,Globals {globals_points = 0.0, globals_max = 11.5, globals_nums = 0})]
+
 return []
 runTests::IO Bool
 runTests = $quickCheckAll
-

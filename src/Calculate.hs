@@ -23,7 +23,7 @@ averageScoreOnQuestion globals qid =
           Just g -> (avg, mx, nums) where
                 nums = fromIntegral (globals_nums g)
                 avg = globals_points g / nums
-                mx = fromIntegral (globals_max g) / nums
+                mx = globals_max g / nums
 
 -- Returns a list of (qustionId, pointsScored, score)
 -- higher score is better
