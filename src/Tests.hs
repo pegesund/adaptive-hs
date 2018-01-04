@@ -11,13 +11,13 @@ import Data.Map.Strict
 
 prop_testGlobals::Bool
 prop_testGlobals =
-   let a1 = Answer 1 1 
+   let a1 = Answer 1 1
        a2 = Answer 2 2
        globals = igMap
        _as = Answers 10 [a1,a2]
-       globals' = addAnswersToGlobals [a1,a2] globals 
-       globals'' = addAnswersToGlobals [a1,a2] globals' 
-    in globals'' == Map.fromList [(1,Globals {globals_points = 2, globals_max = 1, globals_nums = 2}),(2,Globals {globals_points = 4, globals_max = 1, globals_nums = 2})]
+       globals' = addAnswersToGlobals [a1,a2] globals
+       globals'' = addAnswersToGlobals [a1,a2] globals'
+    in globals'' == Map.fromList [(1,Globals {globals_points = 2, globals_max = 1, globals_nums = 2, globals_pass_points = 1}),(2,Globals {globals_points = 4, globals_max = 1, globals_nums = 2, globals_pass_points = 1})]
 
 prop_test_binary::Bool
 prop_test_binary = 
@@ -28,16 +28,19 @@ prop_test_binary =
        b2 = decode b1::Answers
     in b2 == as
 
-testRelation::Maybe (Double, Int)
-testRelation = do 
+testRelation::Maybe (Int, Int)
+testRelation = do
    let a1 = Answer 1 2
        a2 = Answer 4 5
        a3 = Answer 1 500
+       globals = igMap
+       globals' = setScore 1 1 1 globals
+       globals'' = setScore 4 1 1 globals'
        as = [a1,a2]
        as2 = [a3]
        relations = empty_relation 10
-       relations' = addAnswersToRelations as relations
-       relations'' = addAnswersToRelations as2 relations'
+       relations' = addAnswersToRelations as globals'' relations
+       relations'' = addAnswersToRelations as2 globals'' relations'
        Relations _questionId points nums = relations''
    r_points <- Map.lookup 1 points
    r_nums <- Map.lookup 1 nums
@@ -50,13 +53,17 @@ testAnswers pupilId =
        a2 = Answer 2 5
        a3 = Answer 3 3
        a4 = Answer 1 1
+       globals = igMap
+       globals' = setScore 1 1 1 globals
+       globals'' = setScore 2 1 1 globals'
+       globals''' = setScore 3 1 1 globals''
        aList = [a1,a2,a3]
        aList2 = [a4]
        answers = Answers pupilId aList
        answers2 = Answers (pupilId + 1) aList2
        timePoint = empty_timepoint (Just 0) (Just 0) (Just 0)
-       timePoint' = addAnswersToTimePoint answers timePoint
-       timePoint'' =  addAnswersToTimePoint answers2 timePoint'
+       timePoint' = addAnswersToTimePoint answers globals''' timePoint
+       timePoint'' =  addAnswersToTimePoint answers2 globals''' timePoint'
     in timePoint''
 
 -- Insert three answers at the same timpoint
@@ -69,7 +76,7 @@ prop_test_answers =
     in l == Just 3
 
 prop_test_relation::Bool
-prop_test_relation = testRelation == Just (502,2)
+prop_test_relation = testRelation == Just (2,2)
 
 -- Insert 4 answers into an timePoint
 -- Ensure there are 4 after insertion
@@ -87,16 +94,20 @@ testAllRelations =
    let allRelations = newAllRelations
        a1 = Answer 1 1
        a2 = Answer 2 1
-       a3 = Answer 3 1
+       a3 = Answer 3 0
+       globals = igMap
+       globals' = setScore 1 1 1 globals
+       globals'' = setScore 2 1 1 globals'
+       globals''' = setScore 3 1 1 globals''
        aList = [a1,a2]
        aList2 = [a3]
        pupilId = 1
        allAnswers = iaMap
        allAnswers' = Map.insertWith (++) pupilId aList allAnswers
-       allRelations' = addAnswersToAllRelations aList2 pupilId allRelations allAnswers'
-       allRelations'' = addAnswersToAllRelations aList2 pupilId allRelations' allAnswers'
-       allRelations''' = addAnswersToAllRelations aList2 pupilId allRelations'' allAnswers'
-       allRelations'''' = addAnswersToAllRelations aList2 pupilId allRelations''' allAnswers'
+       allRelations' = addAnswersToAllRelations aList2 pupilId  allAnswers' globals''' allRelations
+       allRelations'' = addAnswersToAllRelations aList2 pupilId allAnswers' globals''' allRelations'
+       allRelations''' = addAnswersToAllRelations aList2 pupilId allAnswers' globals''' allRelations''
+       allRelations'''' = addAnswersToAllRelations aList2 pupilId allAnswers' globals''' allRelations'''
     in allRelations''''
 
 
@@ -107,16 +118,16 @@ testAllRelations =
 prop_test_all_relations::Bool
 prop_test_all_relations =
   let r = testAllRelations
-      three = Map.lookup 3 r
-  in three == Just Relations {relation_questionId = 3, relation_points = fromList [(1,4),(2,4)], relation_nums = fromList [(1,4),(2,4)]}
+      three = Map.lookup 1 r
+  in three == Just Relations {relation_questionId = 1, relation_points = fromList [(2,4),(3,0)], relation_nums = fromList [(2,4),(3,4)]}
 
-prop_test_update_maxScore::Bool
-prop_test_update_maxScore =
+prop_test_setScore::Bool
+prop_test_setScore =
   let globals = igMap
-      globals' = updateMaxScore 1 10.5 globals
-      globals'' = updateMaxScore 1 11.5 globals
-  in globals' == fromList [(1,Globals {globals_points = 0.0, globals_max = 10.5, globals_nums = 0})] &&
-     globals''== fromList [(1,Globals {globals_points = 0.0, globals_max = 11.5, globals_nums = 0})]
+      globals' = setScore 1 10.5 5 globals
+      globals'' = setScore 1 11.5 6 globals
+  in globals' == fromList [(1,Globals {globals_points = 0.0, globals_max = 10.5, globals_nums = 0, globals_pass_points  = 5})] &&
+     globals''== fromList [(1,Globals {globals_points = 0.0, globals_max = 11.5, globals_nums = 0, globals_pass_points = 6})]
 
 return []
 runTests::IO Bool

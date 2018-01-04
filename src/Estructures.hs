@@ -46,6 +46,7 @@ type Tags = Map.Map String [Int]
 newTags::Tags
 newTags = Map.empty :: Tags
 
+
 -- Answers, containing all answers from the pupils
 -- Every answer contains the max-score, it is for keeping the history of the answer
 
@@ -83,7 +84,7 @@ instance Binary Answers where
 
 data Relations = Relations {
    relation_questionId :: Int,
-   relation_points :: IDMap,
+   relation_points :: IIMap,
    relation_nums :: IIMap
 } deriving (Show, Eq)
 
@@ -92,7 +93,7 @@ instance Binary Relations where
    get = do relation_questionId <- get; relation_points <- get; relation_nums <- get; return Relations{..}
 
 empty_relation::Int -> Relations
-empty_relation qId = Relations qId idMap iiMap
+empty_relation qId = Relations qId iiMap iiMap
 
 --- Answer global results
 --- Keeps track of accumulated answers results
@@ -105,13 +106,14 @@ empty_relation qId = Relations qId idMap iiMap
 data Globals = Globals {
    globals_points :: Double,
    globals_max :: Double,
-   globals_nums :: Int
+   globals_nums :: Int,
+   globals_pass_points :: Double
 } deriving (Show, Eq)
 
 
 instance Binary Globals where
-   put Globals{..} = do put globals_points; put globals_max; put globals_nums;
-   get = do globals_points <- get; globals_max <- get; globals_nums <- get; return Globals{..}
+   put Globals{..} = do put globals_points; put globals_max; put globals_nums; put globals_pass_points;
+   get = do globals_points <- get; globals_max <- get; globals_nums <- get; globals_pass_points <- get; return Globals{..}
 
 
 -- A snapshow of learning info on a given point in time
