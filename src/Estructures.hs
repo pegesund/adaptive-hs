@@ -29,9 +29,9 @@ idMap = Map.empty
 
 -- Map of questionid - global
 -- Global keeps track of invidual statistics for a question
-type IGMap = Map.Map Int Globals
-igMap::IGMap
-igMap = Map.empty
+type IADMap = Map.Map Int AnswerData
+iadMap::IADMap
+iadMap = Map.empty
 
 
 -- Map from questionId to a Relation
@@ -103,17 +103,18 @@ empty_relation qId = Relations qId iiMap iiMap
 --- numb = number of pupils
 
 
-data Globals = Globals {
-   globals_points :: Double,
-   globals_max :: Double,
-   globals_nums :: Int,
-   globals_pass_points :: Double
+data AnswerData = AnswerData {
+   ad_points :: Double,
+   ad_max :: Double,
+   ad_nums :: Int,
+   ad_pass_points :: Double,
+   ad_failed :: Int
 } deriving (Show, Eq)
 
 
-instance Binary Globals where
-   put Globals{..} = do put globals_points; put globals_max; put globals_nums; put globals_pass_points;
-   get = do globals_points <- get; globals_max <- get; globals_nums <- get; globals_pass_points <- get; return Globals{..}
+instance Binary AnswerData where
+   put AnswerData{..} = do put ad_points; put ad_max; put ad_nums; put ad_pass_points; put ad_failed;
+   get = do ad_points <- get; ad_max <- get; ad_nums <- get; ad_pass_points <- get; ad_failed <- get; return AnswerData{..}
 
 
 -- A snapshow of learning info on a given point in time
@@ -123,14 +124,14 @@ data TimePoint = TimePoint {
    t_month :: Maybe Int,
    t_week :: Maybe Int,
    t_all_relations :: AllRelations,
-   t_globals :: IGMap,
+   t_answerData :: IADMap,
    t_answers :: IAMap,
    t_tags :: Tags 
 } deriving (Show, Eq)
 
 empty_timepoint :: Maybe Int -> Maybe Int -> Maybe Int -> TimePoint
 empty_timepoint year month week =
-   let t = TimePoint year month week newAllRelations igMap iaMap newTags
+   let t = TimePoint year month week newAllRelations iadMap iaMap newTags
    in t
 
 ccompare::Ord p => p -> p -> Ordering -> Ordering
@@ -162,5 +163,5 @@ main2::IO()
 main2 = do
    putStrLn "Life is short"
    c <- getCurrentTime
-   let (y,_m,_d) = toGregorian $ utctDay c
-   print y
+   let (y,m,d) = toGregorian $ utctDay c
+   print (y,m,d)
