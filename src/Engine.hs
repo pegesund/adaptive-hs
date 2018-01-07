@@ -22,7 +22,7 @@ updateMap f answers theMap =
 addAnswersToAnswerData :: [Answer] -> IADMap -> IADMap
 addAnswersToAnswerData answers answerData =
   let updateGlobal a (Just g) = AnswerData (ad_points g + answer_points a) (ad_max g)
-        (ad_nums g + 1) (ad_pass_points g) (ad_failed g + (if answer_points a >= ad_pass_points g then 1 else 0))
+                                           (ad_nums g + 1) (ad_pass_points g) (ad_failed g + (if answer_points a >= ad_pass_points g then 1 else 0))
       updateGlobal a Nothing = error "Question not created"
       f x acc = let qId = answer_questionId x
                     oldVal = Map.lookup qId acc
@@ -45,7 +45,7 @@ addAnswersToAllRelations :: [Answer] -> Pupil -> IAMap -> IADMap -> AllRelations
 addAnswersToAllRelations answers pupilId allAnswers answerDataMap allRelations =
   let pupilAnswers = Map.lookup pupilId allAnswers
       answersTo = fromMaybe [] pupilAnswers
-      answerPermutations = [(i,answersTo) | i <- answers] ++ [(i,answers) | i <- answersTo] ++ [(i, filter (\a -> i /= a) answersTo) | i <- answersTo]
+      answerPermutations = [(i,answersTo) | i <- answers] ++ [(i,answers) | i <- answersTo] ++ [(i, filter (/= i) answersTo) | i <- answersTo]
       addToRelation (fromAnswer, toAnswers) acc =
         let fromAnswer_id = answer_questionId fromAnswer
             relations = Map.lookup fromAnswer_id acc
@@ -57,14 +57,33 @@ addAnswersToAllRelations answers pupilId allAnswers answerDataMap allRelations =
         in acc'
       in Foldable.foldr' addToRelation allRelations answerPermutations
 
-addAnswersToTimePoint :: Answers -> IADMap -> TimePoint -> TimePoint
-addAnswersToTimePoint newAnswers answerDataMap timePoint =
-   let Answers pupil pupilAnswers = newAnswers
-       TimePoint year month week allRelations answerData answers tags = timePoint
+updateFailedGlobal answers root =
+   let failedTotal = root_failed_total root
+       failedPoint answer acc =
+        let answerDataMap = root_answerData root
+            adAnswer = case Map.lookup (answer_questionId answer) answerDataMap of
+               Just a -> a
+               Nothing -> error "Not found answer"
+            in acc + (if answer_points answer >= ad_pass_points adAnswer then 1 else 0)
+       addPoints = foldr' failedPoint 0 answers
+   in root { root_failed_total = (root_failed_total root) + addPoints }
+
+addAnswersToRoot :: Answers -> Int -> Int -> Root -> Root
+addAnswersToRoot newAnswers answerId timePointId root =
+   let timePoint = case Map.lookup timePointId (root_timePoints root) of
+                      Just t -> t
+                      Nothing -> error $ "Missing timepointid: " ++ show timePointId
+       Answers pupil pupilAnswers = newAnswers
+       answers = t_answers timePoint
        answers' = Map.insertWith (++) pupil pupilAnswers answers
+       answerData = root_answerData root
        answerData' = addAnswersToAnswerData pupilAnswers answerData
-       allRelations' = addAnswersToAllRelations pupilAnswers pupil answers answerDataMap allRelations 
-   in TimePoint year month week allRelations' answerData' answers' tags
+       root' = updateFailedGlobal pupilAnswers root
+       allRelations = t_all_relations timePoint
+       allRelations' = addAnswersToAllRelations pupilAnswers pupil answers' answerData' allRelations
+       timePoint' = timePoint { t_all_relations = allRelations' }
+       timePoints' = Map.insert timePointId timePoint' $ root_timePoints root
+   in root' { root_timePoints = timePoints', root_answerData = answerData' }
 
 
 addTagToQuestion :: Tags -> String -> Int -> Tags

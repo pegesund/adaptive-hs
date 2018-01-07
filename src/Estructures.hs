@@ -46,6 +46,12 @@ type Tags = Map.Map String [Int]
 newTags::Tags
 newTags = Map.empty :: Tags
 
+-- Map of TimePoints
+
+type TPMap = Map.Map Int TimePoint
+newTimepointMap::TPMap
+newTimepointMap = Map.empty
+
 
 -- Answers, containing all answers from the pupils
 -- Every answer contains the max-score, it is for keeping the history of the answer
@@ -124,21 +130,26 @@ data TimePoint = TimePoint {
    t_month :: Maybe Int,
    t_week :: Maybe Int,
    t_all_relations :: AllRelations,
-   t_answerData :: IADMap,
    t_answers :: IAMap,
-   t_tags :: Tags 
+   t_id :: Int
 } deriving (Show, Eq)
 
-empty_timepoint :: Maybe Int -> Maybe Int -> Maybe Int -> TimePoint
-empty_timepoint year month week =
-   let t = TimePoint year month week newAllRelations iadMap iaMap newTags
-   in t
+empty_timepoint :: Maybe Int -> Maybe Int -> Maybe Int -> Root -> (Root, TimePoint)
+empty_timepoint year month week root =
+   let timePoints = root_timePoints root
+       tpId = case Map.lookupMax timePoints of
+                 Just (oldId, _) -> oldId + 1
+                 Nothing -> 1
+       t = TimePoint year month week newAllRelations iaMap tpId
+       newTimePoints = Map.insert tpId t timePoints
+       newRoot = root { root_timePoints = newTimePoints }
+   in (newRoot, t)
 
 ccompare::Ord p => p -> p -> Ordering -> Ordering
 ccompare v v' n = let res = compare v v' in if res /= EQ then res else n
 
 instance Ord TimePoint where
-   (TimePoint year month week _ _ _ _) `compare` (TimePoint year' month' week' _ _ _ _) =
+   (TimePoint year month week _ _ _) `compare` (TimePoint year' month' week' _ _ _) =
       ccompare year year' $ ccompare month month' $ ccompare week week' EQ
 
 
@@ -158,6 +169,16 @@ instance Ord PupilScore where
 -- smoother
 
 data SmootType = SmoothPercentage Double | SmoothAbsolute Double
+
+
+-- root ---
+
+data Root = Root {
+  root_failed_total :: Int,
+  root_tags :: Tags,
+  root_answerData :: IADMap,
+  root_timePoints :: TPMap
+}
 
 main2::IO()
 main2 = do
