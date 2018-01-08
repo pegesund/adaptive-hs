@@ -54,12 +54,13 @@ testRelation = do
    let res = (r_points, r_nums)
    return res
 
-testAnswers::Int -> TimePoint
-testAnswers pupilId =
+testAnswers::Int -> Root
+testAnswers courseId =
    let a1 = Answer 1 2
        a2 = Answer 2 5
        a3 = Answer 3 3
        a4 = Answer 1 1
+       pupilId = 100
        answerData = iadMap
        answerData' = setScore 1 1 1 answerData
        answerData'' = setScore 2 1 1 answerData'
@@ -68,33 +69,38 @@ testAnswers pupilId =
        aList2 = [a4]
        answers = Answers pupilId aList
        answers2 = Answers (pupilId + 1) aList2
-       timePoint = empty_timepoint (Just 0) (Just 0) (Just 0)
-       timePoint' = addAnswersToTimePoint answers answerData''' timePoint
-       timePoint'' =  addAnswersToTimePoint answers2 answerData''' timePoint'
-    in timePoint''
+       course = empty_course (Just 0) (Just 0) (Just 0) root
+       courses = newCourseMap
+       courses' = Map.insert 1 course courses
+       root = Root 0 newTags answerData''' courses
+       root' = addAnswersToRoot answers 1 root
+       root'' =  addAnswersToRoot answers2 1 root'
+    in root
+
+--data Root = Root {
+--  root_failed_total :: Int,
+--  root_tags :: Tags,
+--  root_answerData :: IADMap,
+--  root_courses :: TPMap
+--}
+
 
 -- Insert three answers at the same timpoint
 -- Ensure that there are thre answers connected to this person after addition
-prop_test_answers::Bool
-prop_test_answers =
-   let TimePoint _ _ _ _ _ answerMap _ = testAnswers 10
-       answerList = Map.lookup 10 answerMap
-       l = fmap length answerList
-    in l == Just 3
 
 prop_test_relation::Bool
 prop_test_relation = testRelation == Just (2,2)
 
--- Insert 4 answers into an timePoint
+-- Insert 4 answers into an course
 -- Ensure there are 4 after insertion
-testNumberOfAnswers::Int
-testNumberOfAnswers =
-   let TimePoint _ _ _ _ _ answerMap _ = testAnswers 10
-    in numberOfAnswers answerMap
+-- testNumberOfAnswers::Int
+-- testNumberOfAnswers =
+--    let Course _ _ _ _ _ answerMap _ = testAnswers 10
+--    in numberOfAnswers answerMap
 
-prop_test_numberOfAnswers::Bool
-prop_test_numberOfAnswers =
-   4 == testNumberOfAnswers
+-- prop_test_numberOfAnswers::Bool
+-- prop_test_numberOfAnswers =
+--   4 == testNumberOfAnswers
 
 testAllRelations::AllRelations
 testAllRelations =

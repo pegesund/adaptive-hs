@@ -5,6 +5,7 @@ import qualified Data.Map.Strict as Map
 import Control.Arrow
 import Data.Maybe
 
+{-# ANN module "HLint: ignore Use fromMaybe" #-}
 
 updateRelations :: Num b => Map.Map Int b -> (Answer -> b) -> [Answer] -> p -> Map.Map Int b
 updateRelations theMap f answers _fromId =
@@ -66,24 +67,24 @@ updateFailedGlobal answers root =
                Nothing -> error "Not found answer"
             in acc + (if answer_points answer >= ad_pass_points adAnswer then 1 else 0)
        addPoints = foldr' failedPoint 0 answers
-   in root { root_failed_total = (root_failed_total root) + addPoints }
+   in root { root_failed_total = root_failed_total root + addPoints }
 
-addAnswersToRoot :: Answers -> Int -> Int -> Root -> Root
-addAnswersToRoot newAnswers answerId timePointId root =
-   let timePoint = case Map.lookup timePointId (root_timePoints root) of
+addAnswersToRoot :: Answers -> Int -> Root -> Root
+addAnswersToRoot newAnswers courseId root =
+   let course = case Map.lookup courseId (root_courses root) of
                       Just t -> t
-                      Nothing -> error $ "Missing timepointid: " ++ show timePointId
+                      Nothing -> error $ "Missing courseid: " ++ show courseId
        Answers pupil pupilAnswers = newAnswers
-       answers = t_answers timePoint
+       answers = t_answers course
        answers' = Map.insertWith (++) pupil pupilAnswers answers
        answerData = root_answerData root
        answerData' = addAnswersToAnswerData pupilAnswers answerData
        root' = updateFailedGlobal pupilAnswers root
-       allRelations = t_all_relations timePoint
+       allRelations = t_all_relations course
        allRelations' = addAnswersToAllRelations pupilAnswers pupil answers' answerData' allRelations
-       timePoint' = timePoint { t_all_relations = allRelations' }
-       timePoints' = Map.insert timePointId timePoint' $ root_timePoints root
-   in root' { root_timePoints = timePoints', root_answerData = answerData' }
+       course' = course { t_all_relations = allRelations' }
+       courses' = Map.insert courseId course' $ root_courses root
+   in root' { root_courses = courses', root_answerData = answerData' }
 
 
 addTagToQuestion :: Tags -> String -> Int -> Tags

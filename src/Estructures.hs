@@ -46,11 +46,11 @@ type Tags = Map.Map String [Int]
 newTags::Tags
 newTags = Map.empty :: Tags
 
--- Map of TimePoints
+-- Map of Courses
 
-type TPMap = Map.Map Int TimePoint
-newTimepointMap::TPMap
-newTimepointMap = Map.empty
+type TPMap = Map.Map Int Course
+newCourseMap::TPMap
+newCourseMap = Map.empty
 
 
 -- Answers, containing all answers from the pupils
@@ -125,7 +125,7 @@ instance Binary AnswerData where
 
 -- A snapshow of learning info on a given point in time
 
-data TimePoint = TimePoint {
+data Course = Course {
    t_year :: Maybe Int,
    t_month :: Maybe Int,
    t_week :: Maybe Int,
@@ -134,22 +134,22 @@ data TimePoint = TimePoint {
    t_id :: Int
 } deriving (Show, Eq)
 
-empty_timepoint :: Maybe Int -> Maybe Int -> Maybe Int -> Root -> (Root, TimePoint)
-empty_timepoint year month week root =
-   let timePoints = root_timePoints root
-       tpId = case Map.lookupMax timePoints of
+empty_course :: Maybe Int -> Maybe Int -> Maybe Int -> Root -> (Root, Course)
+empty_course year month week root =
+   let courses = root_courses root
+       tpId = case Map.lookupMax courses of
                  Just (oldId, _) -> oldId + 1
                  Nothing -> 1
-       t = TimePoint year month week newAllRelations iaMap tpId
-       newTimePoints = Map.insert tpId t timePoints
-       newRoot = root { root_timePoints = newTimePoints }
+       t = Course year month week newAllRelations iaMap tpId
+       newCourses = Map.insert tpId t courses
+       newRoot = root { root_courses = newCourses }
    in (newRoot, t)
 
 ccompare::Ord p => p -> p -> Ordering -> Ordering
 ccompare v v' n = let res = compare v v' in if res /= EQ then res else n
 
-instance Ord TimePoint where
-   (TimePoint year month week _ _ _) `compare` (TimePoint year' month' week' _ _ _) =
+instance Ord Course where
+   (Course year month week _ _ _) `compare` (Course year' month' week' _ _ _) =
       ccompare year year' $ ccompare month month' $ ccompare week week' EQ
 
 
@@ -177,8 +177,8 @@ data Root = Root {
   root_failed_total :: Int,
   root_tags :: Tags,
   root_answerData :: IADMap,
-  root_timePoints :: TPMap
-}
+  root_courses :: TPMap
+} deriving (Show, Eq)
 
 main2::IO()
 main2 = do
