@@ -23,7 +23,7 @@ updateMap f answers theMap =
 addAnswersToAnswerData :: [Answer] -> IADMap -> IADMap
 addAnswersToAnswerData answers answerData =
   let updateGlobal a (Just g) = AnswerData (ad_points g + answer_points a) (ad_max g)
-                                           (ad_nums g + 1) (ad_pass_points g) (ad_failed g + (if answer_points a >= ad_pass_points g then 1 else 0))
+                                           (ad_nums g + 1) (ad_pass_points g) (ad_failed g + (if answer_points a < ad_pass_points g then 1 else 0))
       updateGlobal a Nothing = error "Question not created"
       f x acc = let qId = answer_questionId x
                     oldVal = Map.lookup qId acc
@@ -65,7 +65,7 @@ updateFailedGlobal answers root =
             adAnswer = case Map.lookup (answer_questionId answer) answerDataMap of
                Just a -> a
                Nothing -> error "Not found answer"
-            in acc + (if answer_points answer >= ad_pass_points adAnswer then 1 else 0)
+            in acc + (if answer_points answer < ad_pass_points adAnswer then 1 else 0)
        addPoints = foldr' failedPoint 0 answers
    in root { root_failed_total = root_failed_total root + addPoints }
 

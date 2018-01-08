@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Tests where
 import Estructures
@@ -64,18 +65,19 @@ testAnswers courseId =
        answerData = iadMap
        answerData' = setScore 1 1 1 answerData
        answerData'' = setScore 2 1 1 answerData'
-       answerData''' = setScore 3 1 1 answerData''
+       answerData''' = setScore 3 10 10 answerData''
        aList = [a1,a2,a3]
        aList2 = [a4]
        answers = Answers pupilId aList
        answers2 = Answers (pupilId + 1) aList2
-       course = empty_course (Just 0) (Just 0) (Just 0) root
        courses = newCourseMap
-       courses' = Map.insert 1 course courses
        root = Root 0 newTags answerData''' courses
-       root' = addAnswersToRoot answers 1 root
-       root'' =  addAnswersToRoot answers2 1 root'
-    in root
+       (root', course) = empty_course (Just 0) (Just 0) (Just 0) root
+       courses' = Map.insert 1 course courses
+       root'' = root { root_courses = courses' }
+       root''' = addAnswersToRoot answers 1 root''
+       root'''' =  addAnswersToRoot answers2 1 root'''
+    in root''''
 
 --data Root = Root {
 --  root_failed_total :: Int,
