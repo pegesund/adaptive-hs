@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module Engine where
 import Estructures
 import Data.Foldable as Foldable
@@ -6,6 +7,7 @@ import Control.Arrow
 import Data.Maybe
 
 {-# ANN module "HLint: ignore Use fromMaybe" #-}
+
 
 updateRelations :: Num b => Map.Map Int b -> (Answer -> b) -> [Answer] -> p -> Map.Map Int b
 updateRelations theMap f answers _fromId =
@@ -58,16 +60,22 @@ addAnswersToAllRelations answers pupilId allAnswers answerDataMap allRelations =
         in acc'
       in Foldable.foldr' addToRelation allRelations answerPermutations
 
-updateFailedGlobal answers root =
-   let failedTotal = root_failed_total root
-       failedPoint answer acc =
-        let answerDataMap = root_answerData root
-            adAnswer = case Map.lookup (answer_questionId answer) answerDataMap of
+
+updateFailedAndPassed :: [Answer] -> Int -> Root -> Root
+updateFailedAndPassed answers courseId root =
+   let failedPoint answer acc =
+         let answerDataMap = root_answerData root
+             adAnswer = case Map.lookup (answer_questionId answer) answerDataMap of
                Just a -> a
                Nothing -> error "Not found answer"
             in acc + (if answer_points answer < ad_pass_points adAnswer then 1 else 0)
-       addPoints = foldr' failedPoint 0 answers
-   in root { root_failed_total = root_failed_total root + addPoints }
+       addPointsFailed = foldr' failedPoint 0 answers
+       course = case Map.lookup courseId (root_courses root) of
+                  Just c -> c
+                  Nothing -> error $ "Not found course id: " ++ show courseId
+       course' = course { course_total_failed = course_total_failed course + addPointsFailed,
+                          course_total_passed = course_total_passed course + (length answers - addPointsFailed) }
+   in root { root_courses = Map.insert courseId course' (root_courses root) }
 
 addAnswersToRoot :: Answers -> Int -> Root -> Root
 addAnswersToRoot newAnswers courseId root =
@@ -75,15 +83,15 @@ addAnswersToRoot newAnswers courseId root =
                       Just t -> t
                       Nothing -> error $ "Missing courseid: " ++ show courseId
        Answers pupil pupilAnswers = newAnswers
-       answers = t_answers course
+       answers = course_answers course
        answers' = Map.insertWith (++) pupil pupilAnswers answers
        answerData = root_answerData root
        answerData' = addAnswersToAnswerData pupilAnswers answerData
-       root' = updateFailedGlobal pupilAnswers root
-       allRelations = t_all_relations course
+       root' = updateFailedAndPassed pupilAnswers courseId root
+       allRelations = course_all_relations course
        allRelations' = addAnswersToAllRelations pupilAnswers pupil answers' answerData' allRelations
-       course' = course { t_all_relations = allRelations' }
-       courses' = Map.insert courseId course' $ root_courses root
+       course' = course { course_all_relations = allRelations' }
+       courses' = Map.insert courseId course' $ root_courses root'
    in root' { root_courses = courses', root_answerData = answerData' }
 
 

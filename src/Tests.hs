@@ -71,10 +71,10 @@ testAnswers courseId =
        answers = Answers pupilId aList
        answers2 = Answers (pupilId + 1) aList2
        courses = newCourseMap
-       root = Root 0 newTags answerData''' courses
-       (root', course) = empty_course (Just 0) (Just 0) (Just 0) root
+       root = Root newTags answerData''' courses
+       (root', course) = empty_course  root
        courses' = Map.insert 1 course courses
-       root'' = root { root_courses = courses' }
+       root'' = root' { root_courses = courses' }
        root''' = addAnswersToRoot answers 1 root''
        root'''' =  addAnswersToRoot answers2 1 root'''
     in root''''
@@ -130,8 +130,8 @@ testAllRelations =
 -- Make sure binding are counted correct
 -- For example should the binding-value between answer-1 and answer-2 increase if they was solved toghter
 -- What is caught in the relation is number of points, and the possible max-points
-prop_test_all_relations::Bool
-prop_test_all_relations =
+prop_tescourse_all_relations::Bool
+prop_tescourse_all_relations =
   let r = testAllRelations
       three = Map.lookup 1 r
   in three == Just Relations {relation_questionId = 1, relation_points = fromList [(2,4),(3,0)], relation_nums = fromList [(2,4),(3,4)]}

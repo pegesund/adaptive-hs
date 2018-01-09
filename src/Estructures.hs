@@ -126,31 +126,30 @@ instance Binary AnswerData where
 -- A snapshow of learning info on a given point in time
 
 data Course = Course {
-   t_year :: Maybe Int,
-   t_month :: Maybe Int,
-   t_week :: Maybe Int,
-   t_all_relations :: AllRelations,
-   t_answers :: IAMap,
-   t_id :: Int
+   course_all_relations :: AllRelations,
+   course_answers :: IAMap,
+   course_id :: Int,
+   course_total_failed :: Int,
+   course_total_passed :: Int
 } deriving (Show, Eq)
 
-empty_course :: Maybe Int -> Maybe Int -> Maybe Int -> Root -> (Root, Course)
-empty_course year month week root =
+empty_course ::  Root -> (Root, Course)
+empty_course root =
    let courses = root_courses root
        tpId = case Map.lookupMax courses of
                  Just (oldId, _) -> oldId + 1
                  Nothing -> 1
-       t = Course year month week newAllRelations iaMap tpId
-       newCourses = Map.insert tpId t courses
+       course = Course newAllRelations iaMap tpId 0 0
+       newCourses = Map.insert tpId course courses
        newRoot = root { root_courses = newCourses }
-   in (newRoot, t)
+   in (newRoot, course)
 
 ccompare::Ord p => p -> p -> Ordering -> Ordering
 ccompare v v' n = let res = compare v v' in if res /= EQ then res else n
 
-instance Ord Course where
-   (Course year month week _ _ _) `compare` (Course year' month' week' _ _ _) =
-      ccompare year year' $ ccompare month month' $ ccompare week week' EQ
+-- instance Ord Course where
+--   (Course year month week _ _ _) `compare` (Course year' month' week' _ _ _) =
+--      ccompare year year' $ ccompare month month' $ ccompare week week' EQ
 
 
 -- Score: how good a pupil has scored on a question
@@ -174,7 +173,6 @@ data SmootType = SmoothPercentage Double | SmoothAbsolute Double
 -- root ---
 
 data Root = Root {
-  root_failed_total :: Int,
   root_tags :: Tags,
   root_answerData :: IADMap,
   root_courses :: TPMap
