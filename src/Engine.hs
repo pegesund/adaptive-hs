@@ -1,4 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE Strict, StrictData #-}
 module Engine where
 import Estructures
 import Data.Foldable as Foldable
@@ -74,23 +75,28 @@ updateFailedAndPassed answers courseId root =
                   Just c -> c
                   Nothing -> error $ "Not found course id: " ++ show courseId
        course' = course { course_total_failed = course_total_failed course + addPointsFailed,
-                          course_total_passed = course_total_passed course + (length answers - addPointsFailed) }
+                          course_total_passed = course_total_passed course + (length answers - addPointsFailed)
+                          }
    in root { root_courses = Map.insert courseId course' (root_courses root) }
 
 addAnswersToRoot :: Answers -> Int -> Root -> Root
 addAnswersToRoot newAnswers courseId root =
-   let course = case Map.lookup courseId (root_courses root) of
+   let Answers pupil pupilAnswers = newAnswers
+       root' = updateFailedAndPassed pupilAnswers courseId root
+       course = case Map.lookup courseId (root_courses root') of
                       Just t -> t
                       Nothing -> error $ "Missing courseid: " ++ show courseId
-       Answers pupil pupilAnswers = newAnswers
        answers = course_answers course
        answers' = Map.insertWith (++) pupil pupilAnswers answers
        answerData = root_answerData root
        answerData' = addAnswersToAnswerData pupilAnswers answerData
-       root' = updateFailedAndPassed pupilAnswers courseId root
        allRelations = course_all_relations course
        allRelations' = addAnswersToAllRelations pupilAnswers pupil answers' answerData' allRelations
-       course' = course { course_all_relations = allRelations' }
+       newPupilAnswers = case Map.lookup pupil (course_answers course) of
+                            Nothing -> pupilAnswers
+                            Just a -> pupilAnswers ++ a
+       newAllAnswers = Map.insert pupil newPupilAnswers (course_answers course)
+       course' = course { course_all_relations = allRelations', course_answers = newAllAnswers }
        courses' = Map.insert courseId course' $ root_courses root'
    in root' { root_courses = courses', root_answerData = answerData' }
 

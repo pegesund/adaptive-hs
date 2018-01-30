@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3a9096481143df9bb48ee1cf165f3a1fdc4f95bda22499a1eb9b01f210c7edb9
+-- hash: 581b34cc80e335be2d3212892800e628d04d809875d7f35ab7197a858a4ba695
 
 name:           better-learn
 version:        0.1.0.0
@@ -31,6 +31,7 @@ library
       src
   build-depends:
       QuickCheck
+    , ace
     , base >=4.7 && <5
     , binary
     , containers
@@ -40,6 +41,7 @@ library
       Engine
       Estructures
       Lib
+      Simple
       Tests
   other-modules:
       Paths_better_learn
@@ -52,6 +54,7 @@ executable better-learn-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       QuickCheck
+    , ace
     , base >=4.7 && <5
     , better-learn
     , binary
@@ -69,6 +72,7 @@ test-suite better-learn-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       QuickCheck
+    , ace
     , base >=4.7 && <5
     , better-learn
     , binary

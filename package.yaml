@@ -25,6 +25,7 @@ dependencies:
 - time
 - binary
 - QuickCheck
+- ace
 
 library:
   source-dirs: src

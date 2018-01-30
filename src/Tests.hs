@@ -10,6 +10,8 @@ import Data.Binary
 import Calculate
 import Data.Map.Strict
 
+{-# ANN module "HLint: ignore Use camelCase" #-}
+
 testanswerData :: IADMap
 testanswerData =
    let a1 = Answer 1 1
@@ -24,7 +26,7 @@ testanswerData =
 
 prop_testanswerData::Bool
 prop_testanswerData =
-    testanswerData == Map.fromList [(1,AnswerData {ad_points = 2, ad_max = 2, ad_nums = 2, ad_pass_points = 2, ad_failed = 0}),(2,AnswerData {ad_points = 4, ad_max = 2, ad_nums = 2, ad_pass_points = 2, ad_failed = 2})]
+    testanswerData == fromList [(1,AnswerData {ad_points = 2.0, ad_max = 2.0, ad_nums = 2, ad_pass_points = 2.0, ad_failed = 2}),(2,AnswerData {ad_points = 4.0, ad_max = 2.0, ad_nums = 2, ad_pass_points = 2.0, ad_failed = 0})]
 
 
 prop_test_binary::Bool
@@ -55,8 +57,8 @@ testRelation = do
    let res = (r_points, r_nums)
    return res
 
-testAnswers::Int -> Root
-testAnswers courseId =
+testAnswers:: Root
+testAnswers =
    let a1 = Answer 1 2
        a2 = Answer 2 5
        a3 = Answer 3 3
@@ -76,15 +78,13 @@ testAnswers courseId =
        courses' = Map.insert 1 course courses
        root'' = root' { root_courses = courses' }
        root''' = addAnswersToRoot answers 1 root''
-       root'''' =  addAnswersToRoot answers2 1 root'''
+       root'''' = addAnswersToRoot answers2 1 root'''
     in root''''
 
---data Root = Root {
---  root_failed_total :: Int,
---  root_tags :: Tags,
---  root_answerData :: IADMap,
---  root_courses :: TPMap
---}
+
+prop_testAnswers =
+   let r = testAnswers in
+     r == Root {root_tags = fromList [], root_answerData = fromList [(1,AnswerData {ad_points = 3.0, ad_max = 1.0, ad_nums = 2, ad_pass_points = 1.0, ad_failed = 0}),(2,AnswerData {ad_points = 5.0, ad_max = 1.0, ad_nums = 1, ad_pass_points = 1.0, ad_failed = 0}),(3,AnswerData {ad_points = 3.0, ad_max = 10.0, ad_nums = 1, ad_pass_points = 10.0, ad_failed = 1})], root_courses = fromList [(1,Course {course_all_relations = fromList [(1,Relations {relation_questionId = 1, relation_points = fromList [(2,3),(3,0)], relation_nums = fromList [(2,3),(3,3)]}),(2,Relations {relation_questionId = 2, relation_points = fromList [(1,3),(3,0)], relation_nums = fromList [(1,3),(3,3)]}),(3,Relations {relation_questionId = 3, relation_points = fromList [(1,3),(2,3)], relation_nums = fromList [(1,3),(2,3)]})], course_answers = fromList [(100,[Answer {answer_questionId = 1, answer_points = 2.0},Answer {answer_questionId = 2, answer_points = 5.0},Answer {answer_questionId = 3, answer_points = 3.0}]),(101,[Answer {answer_questionId = 1, answer_points = 1.0}])], course_id = 1, course_total_failed = 1, course_total_passed = 3})]}
 
 
 -- Insert three answers at the same timpoint
@@ -93,16 +93,6 @@ testAnswers courseId =
 prop_test_relation::Bool
 prop_test_relation = testRelation == Just (2,2)
 
--- Insert 4 answers into an course
--- Ensure there are 4 after insertion
--- testNumberOfAnswers::Int
--- testNumberOfAnswers =
---    let Course _ _ _ _ _ answerMap _ = testAnswers 10
---    in numberOfAnswers answerMap
-
--- prop_test_numberOfAnswers::Bool
--- prop_test_numberOfAnswers =
---   4 == testNumberOfAnswers
 
 testAllRelations::AllRelations
 testAllRelations =
@@ -126,7 +116,7 @@ testAllRelations =
     in allRelations''''
 
 
--- Insert some ansers into relations
+-- Insert some answers into relations
 -- Make sure binding are counted correct
 -- For example should the binding-value between answer-1 and answer-2 increase if they was solved toghter
 -- What is caught in the relation is number of points, and the possible max-points
