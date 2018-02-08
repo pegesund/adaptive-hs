@@ -46,8 +46,8 @@ smoothPupilWeakSpots globals sfactor pupilScores =
 	case sfactor of
 	   SmoothPercentage f -> pupilScore' where
 	   		sumPoints = Map.foldr (\g acc -> acc + globals_nums g) 0 globals
-	   		pupilScore' = filter (hasHigerPrecentage f) pupilScores
-	   		hasHigerPrecentage f pupilScore = f >= 100.0 * (getNumGlobal pupilScore) / (fromIntegral sumPoints) 
+	   		hasHigerPrecentage f pupilScore = f >= 100.0 * (getNumGlobal pupilScore) / (fromIntegral sumPoints)
+	   		pupilScore' = filter (hasHigerPrecentage f) pupilScores 
 	   SmoothAbsolute f -> filter (hasMoreNums f) pupilScores where
 	        hasMoreNums f pupilScore = f >= getNumGlobal pupilScore 
 	where getNumGlobal pupilScore = 
