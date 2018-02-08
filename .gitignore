@@ -1,1 +1,5 @@
 *.swp
+.stack-work/
+.idea/
+better-learn.iml
+out/
