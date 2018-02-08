@@ -56,17 +56,12 @@ smoothPupilWeakSpots answerData sfactor pupilScores =
                  Nothing -> error "Inconsistent data in smoothPupilWeakSpots" 
                  Just g -> fromIntegral $ ad_nums g
 
---- Shannons entropy
-shannon :: (Floating a, Eq a) => a -> a -> a
-shannon s k = k / s * log(k / s + (if k == 0 then 1 else 0))
-
----- log likehood see: http://tdunning.blogspot.no/2008/03/surprise-and-coincidence.html
-logLikehood :: (Floating a, Eq a) => a -> a -> a -> a -> a
-logLikehood aAndB aNotB bNotA notANorB =
-   let s = aAndB + aNotB + bNotA + notANorB
-       ss = shannon s
-       total = ss aAndB + ss aNotB + ss bNotA + ss notANorB
-       row = ss aAndB + bNotA + ss aNotB + notANorB
-       col = ss aAndB + aNotB + ss bNotA + notANorB
-       in 2 * s * (total - row - col)
+xLogX x = if x == 0 then 0 else x * log(x)
+entropy2 a b = xLogX(a + b) - xLogX(a) - xLogX(b)
+entropy4 a b c d = xLogX(a + b + c + d) - xLogX(a) - xLogX(b) - xLogX(c) - xLogX(d);
+logLikelihoodRatio a_and_b a_not_b b_not_a not_a_nor_b =
+   let rowEntropy = entropy2 (a_and_b + a_not_b) (b_not_a + not_a_nor_b)
+       columnEntropy = entropy2 (a_and_b + b_not_a) (a_not_b + not_a_nor_b)
+       matrixEntropy = entropy4 a_and_b a_not_b b_not_a not_a_nor_b
+    in if rowEntropy + columnEntropy < matrixEntropy then 0 else 2.0 * (rowEntropy + columnEntropy - matrixEntropy);
 

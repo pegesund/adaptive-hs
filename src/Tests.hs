@@ -134,6 +134,13 @@ prop_test_setScore =
   in answerData' == fromList [(1,AnswerData {ad_points = 0.0, ad_max = 10.5, ad_nums = 0, ad_pass_points  = 5, ad_failed = 0})] &&
      answerData''== fromList [(1,AnswerData {ad_points = 0.0, ad_max = 11.5, ad_nums = 0, ad_pass_points = 6, ad_failed = 0})]
 
+testScore misses_a_and_b misses_a misses_b misses_total =
+  logLikelihoodRatio misses_a_and_b (misses_a - misses_a_and_b) (misses_b - misses_a_and_b) (misses_total - misses_a - misses_b)
+
+
+  -- aAndB + aNotB + bNotA + notANorB
+
+
 return []
 runTests::IO Bool
 runTests = $quickCheckAll
